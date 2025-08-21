@@ -1,0 +1,284 @@
+<?php
+// OOP uyumlu sınıf: Kişi bilgilerini tutmak için
+class Person {
+    public $id;
+    public $name;
+    public $surname;
+    public $title;
+    public $profession;
+    public $birthDeath;
+    public $locationLink; // Konum linki (örneğin Google Maps linki, koordinatlara çevrilecek)
+    public $profileImage; // Profil resmi dosya yolu
+
+    public function __construct($id, $name, $surname, $title, $profession, $birthDeath, $locationLink, $profileImage) {
+        $this->id = $id;
+        $this->name = $name;
+        $this->surname = $surname;
+        $this->title = $title;
+        $this->profession = $profession;
+        $this->birthDeath = $birthDeath;
+        $this->locationLink = $locationLink;
+        $this->profileImage = $profileImage;
+    }
+
+    // Koordinatları linkten çıkarma (basit parse, gerçekte API kullanın)
+    public function getCoordinates() {
+        preg_match('/q=([\d\.]+),([\d\.]+)/', $this->locationLink, $matches);
+        return [$matches[1] ?? 41.0082, $matches[2] ?? 28.9784]; // Varsayılan İstanbul
+    }
+}
+
+// Kişileri JSON dosyasından yükle
+$personsData = [];
+if (file_exists('persons.json')) {
+    $personsData = json_decode(file_get_contents('persons.json'), true) ?: [];
+}
+$persons = [];
+foreach ($personsData as $data) {
+    $persons[] = new Person(
+        $data['id'],
+        $data['name'],
+        $data['surname'],
+        $data['title'],
+        $data['profession'],
+        $data['birthDeath'],
+        $data['locationLink'],
+        $data['profileImage']
+    );
+}
+
+// JSON olarak JS'ye geçir
+$personsJson = json_encode(array_map(function ($p) {
+    $coords = $p->getCoordinates();
+    return [
+        'id' => $p->id,
+        'name' => $p->name,
+        'surname' => $p->surname,
+        'title' => $p->title,
+        'profession' => $p->profession,
+        'birthDeath' => $p->birthDeath,
+        'lat' => $coords[0],
+        'lng' => $coords[1],
+        'profileImage' => $p->profileImage
+    ];
+}, $persons), JSON_PARTIAL_OUTPUT_ON_ERROR);
+?>
+
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harita Uygulaması</title>
+    <!-- Bootstrap CSS for responsive design -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <style>
+        *, body{
+            font-family: system-ui;
+        }
+        #map {
+            height: 500px;
+        }
+
+        .leaflet-div-icon {
+            background: none !important;
+            border: none !important;
+        }
+
+        .custom-marker {
+            position: relative;
+            width: 70px;
+            height: 100px;
+            background: url('pın.png') no-repeat center;
+            background-size: contain;
+            transition: transform 0.3s;
+        }
+
+        .custom-marker:hover {
+            transform: scale(1.2);
+        }
+
+        .custom-marker img {
+            position: absolute;
+            top: 28%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 27px;
+            height: 27px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .details {
+            padding: 20px;
+            border: 1px solid #ccc;
+            margin-top: 20px;
+        }
+
+        .person-list {
+            height: 500px;
+            overflow-y: auto;
+            border-right: 1px solid #ccc;
+        }
+
+        .person-item {
+            display: flex;
+            gap: 10px;
+            cursor: pointer;
+            transition: transform 0.3s;
+            padding: 0px 10px 0px 10px;
+            border-radius: 5px;
+        }
+
+        .person-item:hover {
+            border: 1px solid #007bff;
+            background-color: rgb(247, 235, 245);
+            transform: scale(1.05) translateX(5px);
+        }
+
+        .person-image {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #fff;
+            border-radius: 50%;
+            position: relative;
+            align-self: center;
+        }
+        .add-person-btn {
+            background-color: rgb(255, 255, 250);
+            color: black;
+            border: none;
+            box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+            border-radius: 5px;
+            padding: 8px 15px;
+            margin-right: 10px;
+            text-decoration: none;
+        }
+        .add-person-btn:hover {
+            background-color: #e0e0e0;
+            transform: scale(1.05);
+        }
+        .delete-btn {
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 2px 8px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .delete-btn:hover {
+            background-color: #cc0000;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 person-list">
+                <h4>Kişiler</h4>
+                <?php foreach ($persons as $p): ?>
+                    <div class="person-item" data-id="<?php echo $p->id; ?>">
+                        <img src="<?php echo $p->profileImage; ?>" class="person-image" alt="<?php echo $p->name; ?>">
+                        <div>
+                            <strong><?php echo $p->name . ' ' . $p->surname; ?></strong><br>
+                            <small><?php echo $p->title; ?> (<?php echo $p->profession; ?>) <?php echo $p->birthDeath; ?></small>
+                        </div>
+                        <form action="delete-person.php" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="<?php echo $p->id; ?>">
+                            <button type="submit" class="delete-btn">Sil</button>
+                        </form>
+                    </div>
+                <?php endforeach; ?>
+                
+                <a href="add-person.php" class="add-person-btn">Kişi Ekle</a>
+
+            </div>
+            <div class="col-md-8">
+                <h1>Harita Üzerinde Kişiler</h1>
+                <div id="map"></div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div id="details" class="details"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        const persons = <?php echo $personsJson; ?>;
+
+        const map = L.map('map').setView([39, 35], 6);
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(map);
+
+        persons.forEach(person => {
+            const markerHtml = `<div class="custom-marker"><img src="${person.profileImage}" alt="${person.name}"></div>`;
+            const customIcon = L.divIcon({
+                html: markerHtml,
+                iconSize: [50, 70],
+                iconAnchor: [25, 70]
+            });
+
+            const marker = L.marker([person.lat, person.lng], {
+                icon: customIcon
+            }).addTo(map);
+
+            marker.bindTooltip(`
+                <b>${person.name} ${person.surname}</b><br>
+                ${person.title} - ${person.profession}<br>
+                ${person.birthDeath}
+            `, {
+                direction: 'top',
+                sticky: true
+            });
+
+            marker.on('click', () => {
+                map.flyTo([person.lat, person.lng], 18, {
+                    animate: true,
+                    duration: 2
+                });
+                document.getElementById('details').innerHTML = `
+                    <h2>${person.name} ${person.surname}<a href="profile.php?id=${person.id}" class="btn btn-primary">Profile Git</a></h2>
+                    <img src="${person.profileImage}" alt="Profil" style="width:200px;">
+                    <p><b>Ünvan:</b> ${person.title}</p>
+                    <p><b>Meslek:</b> ${person.profession}</p>
+                    <p><b>Doğum-Ölüm:</b> ${person.birthDeath}</p>
+                `;
+            });
+        });
+
+        // Liste öğelerine tıklama eventi
+        document.querySelectorAll('.person-item').forEach(item => {
+            item.addEventListener('click', () => {
+                const id = item.getAttribute('data-id');
+                const person = persons.find(p => p.id === parseInt(id));
+                if (person) {
+                    map.flyTo([person.lat, person.lng], 18, {
+                        animate: true,
+                        duration: 2
+                    });
+                    document.getElementById('details').innerHTML = `
+                        <h2>${person.name} ${person.surname}<a href="profile.php?id=${person.id}" class="btn btn-primary">Profile Git</a></h2>
+                        <img src="${person.profileImage}" alt="Profil" style="width:200px;">
+                        <p><b>Ünvan:</b> ${person.title}</p>
+                        <p><b>Meslek:</b> ${person.profession}</p>
+                        <p><b>Doğum-Ölüm:</b> ${person.birthDeath}</p>
+                    `;
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
