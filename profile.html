@@ -141,26 +141,20 @@
         return [lat, lon];
     }
 
-    // Türkçe karakterleri Latin harflerine çeviren fonksiyon
+    // Türkçe karakterleri Latin harflerine çeviren ve adsoyad formatında urlSlug oluşturan fonksiyon
     function createUrlSlug(name, surname) {
         const turkishToLatin = str => str
             .replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i')
             .replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u')
             .replace(/Ç/g, 'C').replace(/Ğ/g, 'G').replace(/İ/g, 'I')
             .replace(/Ö/g, 'O').replace(/Ş/g, 'S').replace(/Ü/g, 'U');
-        return `${turkishToLatin(name.toLowerCase())}+${
-            turkishToLatin(surname.toLowerCase())}`;
+        return `${turkishToLatin(name.toLowerCase())}${turkishToLatin(surname.toLowerCase())}`;
     }
 
-    // URL'den ad veya id parametresini al
+    // URL'den parametreyi al (ad= olmadan)
     const urlParams = new URLSearchParams(window.location.search);
-    let urlSlug = urlParams.get('ad');
+    const urlSlug = Array.from(urlParams.keys())[0] || urlParams.get('ad'); // İlk parametreyi al, yoksa ad= dene
     const id = parseInt(urlParams.get('id'));
-
-    // URL'deki boşlukları + ile değiştir
-    if (urlSlug) {
-        urlSlug = urlSlug.replace(/\s+/g, '+');
-    }
 
     console.log('URL Parametreleri:', { urlSlug, id }); // Hata ayıklama için
 
@@ -272,7 +266,7 @@
                         });
                     L.polyline([coords, familyCoords], { color: 'red' }).addTo(map);
                     familyMarker.on('click', () => {
-                        window.location.href = `profile.html?ad=${
+                        window.location.href = `profile.html?${
                             familyPerson.urlSlug ||
                             createUrlSlug(familyPerson.name, familyPerson.surname)}`;
                     });
@@ -333,6 +327,7 @@
     </script>
 </body>
 </html>
+
 
 
 
