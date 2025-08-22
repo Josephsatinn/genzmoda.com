@@ -122,16 +122,20 @@
     <script>
         // JSON dosyasını ve localStorage'ı yükle
         fetch('persons.json')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('persons.json bulunamadı');
+                return response.json();
+            })
             .then(staticPersons => {
                 // localStorage'dan dinamik kişileri al
                 const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
                 const persons = [...staticPersons, ...dynamicPersons].map(person => {
-                    const match = person.locationLink.match(/q=([\d\.]+),([\d\.]+)/);
+                    const match = person.locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/);
                     return {
                         ...person,
                         lat: match ? parseFloat(match[1]) : 41.0082, // Varsayılan İstanbul
-                        lng: match ? parseFloat(match[2]) : 28.9784
+                        lng: match ? parseFloat(match[2]) : 28.9784,
+                        urlSlug: person.urlSlug || encodeURIComponent(`${person.name.toLowerCase()}+${person.surname.toLowerCase()}`)
                     };
                 });
 
@@ -170,7 +174,7 @@
                             duration: 2
                         });
                         document.getElementById('details').innerHTML = `
-                            <h2>${person.name} ${person.surname}<a href="profile.html?id=${person.id}" class="btn btn-primary">Profile Git</a></h2>
+                            <h2>${person.name} ${person.surname}<a href="profile.html?ad=${person.urlSlug}" class="btn btn-primary">Profile Git</a></h2>
                             <img src="${person.profileImage || 'images/default.jpg'}" alt="Profil" style="width:200px;">
                             <p><b>Ünvan:</b> ${person.title}</p>
                             <p><b>Meslek:</b> ${person.profession}</p>
@@ -188,7 +192,7 @@
                     div.innerHTML = `
                         <img src="${person.profileImage || 'images/default.jpg'}" class="person-image" alt="${person.name}">
                         <div>
-                            <strong>${person.name} ${person.surname}</strong><br>
+                            <strong><a href="profile.html?ad=${person.urlSlug}">${person.name} ${person.surname}</a></strong><br>
                             <small>${person.title} (${person.profession}) ${person.birthDeath}</small>
                         </div>
                         <button class="delete-btn" onclick="deletePerson(${person.id})">Sil</button>
@@ -199,7 +203,7 @@
                             duration: 2
                         });
                         document.getElementById('details').innerHTML = `
-                            <h2>${person.name} ${person.surname}<a href="profile.html?id=${person.id}" class="btn btn-primary">Profile Git</a></h2>
+                            <h2>${person.name} ${person.surname}<a href="profile.html?ad=${person.urlSlug}" class="btn btn-primary">Profile Git</a></h2>
                             <img src="${person.profileImage || 'images/default.jpg'}" alt="Profil" style="width:200px;">
                             <p><b>Ünvan:</b> ${person.title}</p>
                             <p><b>Meslek:</b> ${person.profession}</p>
@@ -209,13 +213,27 @@
                     personList.appendChild(div);
                 });
             })
-            .catch(error => console.error('JSON yüklenirken hata:', error));
+            .catch(error => {
+                console.error('JSON yüklenirken hata:', error);
+                document.getElementById('person-list').innerHTML = '<p>Kişiler yüklenirken hata oluştu.</p>';
+            });
 
         // Dinamik kişiyi silme
         function deletePerson(id) {
             const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
             const updatedPersons = dynamicPersons.filter(person => person.id !== id);
             localStorage.setItem('dynamicPersons', JSON.stringify(updatedPersons));
+
+            // Aile ilişkilerinden de sil
+            const familyRelations = JSON.parse(localStorage.getItem('familyRelations') || '{}');
+            delete familyRelations[id];
+            Object.keys(familyRelations).forEach(key => {
+                if (familyRelations[key][id]) {
+                    delete familyRelations[key][id];
+                }
+            });
+            localStorage.setItem('familyRelations', JSON.stringify(familyRelations));
+
             alert(`Kişi (ID: ${id}) silindi. Sayfayı yenileyin.`);
             window.location.reload();
         }
