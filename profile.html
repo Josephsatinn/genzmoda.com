@@ -123,8 +123,22 @@
     <script>
         // Koordinatları linkten çıkarma fonksiyonu
         function getCoordinates(locationLink) {
-            const match = locationLink.match(/q=([\d.-]+),([\d.-]+)/);
-            return [match ? parseFloat(match[1]) : 41.0082, match ? parseFloat(match[2]) : 28.9784]; // Varsayılan İstanbul
+            if (!locationLink) {
+                console.warn('Location link eksik, varsayılan koordinatlar kullanılıyor.');
+                return [41.0082, 28.9784]; // Varsayılan İstanbul
+            }
+            const match = locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/);
+            if (!match) {
+                console.warn(`Geçersiz locationLink formatı: ${locationLink}`);
+                return [41.0082, 28.9784]; // Varsayılan İstanbul
+            }
+            const lat = parseFloat(match[1]);
+            const lon = parseFloat(match[2]);
+            if (isNaN(lat) || isNaN(lon)) {
+                console.warn(`Geçersiz koordinatlar: ${locationLink}`);
+                return [41.0082, 28.9784]; // Varsayılan İstanbul
+            }
+            return [lat, lon];
         }
 
         // Aile ilişkileri (sabit kayıtlar için)
@@ -147,11 +161,13 @@
             .then(staticPersons => {
                 const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
                 const persons = [...staticPersons, ...dynamicPersons];
+                console.log('Yüklenen kişiler:', persons); // Hata ayıklama için
                 const person = persons.find(p => p.id === id);
 
                 if (!person) {
                     document.getElementById('details').innerHTML = '<p>Kişi bulunamadı.</p>';
                     document.title = 'Kişi Bulunamadı';
+                    console.error(`ID ${id} için kişi bulunamadı.`);
                     return;
                 }
 
@@ -163,13 +179,14 @@
                 // Detayları göster
                 document.getElementById('details').innerHTML = `
                     <h2>${person.name} ${person.surname}</h2>
-                    <p><b>Ünvan:</b> ${person.title}</p>
-                    <p><b>Meslek:</b> ${person.profession}</p>
-                    <p><b>Doğum-Ölüm:</b> ${person.birthDeath}</p>
+                    <p><b>Ünvan:</b> ${person.title || 'Belirtilmemiş'}</p>
+                    <p><b>Meslek:</b> ${person.profession || 'Belirtilmemiş'}</p>
+                    <p><b>Doğum-Ölüm:</b> ${person.birthDeath || 'Belirtilmemiş'}</p>
                 `;
 
                 // Harita başlat
                 const coords = getCoordinates(person.locationLink);
+                console.log('Ana koordinatlar:', coords); // Hata ayıklama için
                 const map = L.map('profile-map').setView(coords, 12);
                 L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                     maxZoom: 19,
@@ -188,9 +205,11 @@
 
                 // Aile ilişkilerini haritaya ekle
                 const family = familyRelations[id] || {};
+                console.log('Aile ilişkileri:', family); // Hata ayıklama için
                 persons.forEach(familyPerson => {
                     if (family[familyPerson.id]) {
                         const familyCoords = getCoordinates(familyPerson.locationLink);
+                        console.log(`Aile üyesi koordinatları (${familyPerson.name}):`, familyCoords);
                         const familyMarkerHtml = `<div class="custom-marker"><img src="${familyPerson.profileImage || 'images/default.jpg'}" alt="${familyPerson.name}"></div>`;
                         const familyIcon = L.divIcon({
                             html: familyMarkerHtml,
@@ -207,8 +226,16 @@
                 });
 
                 // Ek lokasyonları haritaya ekle
-                Object.entries(person.additionalLocations || {}).forEach(([locationName, [locationLink, yapimYili, detay, resimler]]) => {
+                const additionalLocations = person.additionalLocations || {};
+                console.log('Ek lokasyonlar:', additionalLocations); // Hata ayıklama için
+                Object.entries(additionalLocations).forEach(([locationName, locationData]) => {
+                    if (!Array.isArray(locationData) || locationData.length < 4) {
+                        console.warn(`Geçersiz ek lokasyon verisi: ${locationName}`, locationData);
+                        return;
+                    }
+                    const [locationLink, yapimYili, detay, resimler] = locationData;
                     const additionalCoords = getCoordinates(locationLink);
+                    console.log(`Ek lokasyon koordinatları (${locationName}):`, additionalCoords);
                     const additionalMarkerHtml = `<div class="custom-marker additional-marker"><span>${locationName}</span></div>`;
                     const additionalIcon = L.divIcon({
                         html: additionalMarkerHtml,
@@ -224,13 +251,13 @@
                             <h2>${locationName}</h2>
                             <div class="gallery">
                         `;
-                        resimler.forEach(resim => {
+                        (resimler || []).forEach(resim => {
                             locationHtml += `<img src="${resim}" alt="${locationName}" style="max-width: 300px; margin: 10px;">`;
                         });
                         locationHtml += `
                             </div>
-                            <p><b>Yapım Yılı:</b> ${yapimYili}</p>
-                            <p><b>Detay:</b> ${detay}</p>
+                            <p><b>Yapım Yılı:</b> ${yapimYili || 'Belirtilmemiş'}</p>
+                            <p><b>Detay:</b> ${detay || 'Belirtilmemiş'}</p>
                         `;
                         document.getElementById('location-details').innerHTML = locationHtml;
                         document.getElementById('location-details').style.display = 'block';
@@ -242,6 +269,9 @@
                     document.getElementById('location-details').style.display = 'none';
                     document.getElementById('details').style.display = 'block';
                 });
+
+                // Haritayı yeniden boyutlandır
+                setTimeout(() => map.invalidateSize(), 100); // Harita boyutunu güncelle
             })
             .catch(error => {
                 console.error('JSON yüklenirken hata:', error);
