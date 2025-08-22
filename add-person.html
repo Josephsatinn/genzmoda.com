@@ -221,212 +221,211 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
-        // Mini Harita (Ana Konum)
-        const miniMap = L.map('mini-map').setView([41.0082, 28.9784], 12);
+    // Mini Harita (Ana Konum)
+    const miniMap = L.map('mini-map').setView([41.0082, 28.9784], 12);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(miniMap);
+    setTimeout(() => miniMap.invalidateSize(), 100);
+
+    let marker = null;
+    miniMap.on('click', (e) => {
+        if (marker) miniMap.removeLayer(marker);
+        marker = L.marker(e.latlng).addTo(miniMap)
+            .bindTooltip(`Seçilen: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`, { direction: 'top', sticky: true });
+    });
+
+    function selectLocation() {
+        if (marker) {
+            const lat = marker.getLatLng().lat;
+            const lng = marker.getLatLng().lng;
+            document.getElementById('selectedLat').value = lat;
+            document.getElementById('selectedLng').value = lng;
+            document.getElementById('locationLink').value = `https://maps.google.com/?q=${lat},${lng}`;
+        } else {
+            alert('Lütfen haritadan bir konum seçin!');
+        }
+    }
+
+    // Dinamik Ek Lokasyon Haritaları
+    let locationCount = 1;
+    let additionalMaps = {};
+    let additionalMarkers = {};
+
+    // İlk ek lokasyon haritasını başlat
+    const initialMap = L.map('mini-map-location-0').setView([41.0082, 28.9784], 12);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(initialMap);
+    additionalMaps[0] = initialMap;
+    additionalMarkers[0] = null;
+    initialMap.on('click', (e) => {
+        if (additionalMarkers[0]) initialMap.removeLayer(additionalMarkers[0]);
+        additionalMarkers[0] = L.marker(e.latlng).addTo(initialMap)
+            .bindTooltip(`Seçilen: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`, { direction: 'top', sticky: true });
+    });
+    setTimeout(() => initialMap.invalidateSize(), 100);
+
+    function addLocation() {
+        locationCount++;
+        const locationDiv = document.createElement('div');
+        locationDiv.className = 'location-group';
+        locationDiv.id = `location-${locationCount}`;
+        locationDiv.innerHTML = `
+            <div class="form-group">
+                <label for="location_name_${locationCount}" class="form-label">Ek Lokasyon Adı</label>
+                <input type="text" class="form-control" id="location_name_${locationCount}" name="location_name_${locationCount}">
+            </div>
+            <div class="form-group">
+                <label for="location_link_${locationCount}" class="form-label">Ek Lokasyon Linki</label>
+                <input type="text" class="form-control" id="location_link_${locationCount}" name="location_link_${locationCount}" placeholder="Örneğin: https://maps.google.com/?q=41.0050,28.9750">
+                <div id="mini-map-location-${locationCount}" class="mini-map-location"></div>
+                <button type="button" class="btn-select-location mt-2" onclick="selectLocationForAdditional(${locationCount})">Seç</button>
+                <input type="hidden" id="selectedLat-${locationCount}" name="selectedLat-${locationCount}">
+                <input type="hidden" id="selectedLng-${locationCount}" name="selectedLng-${locationCount}">
+            </div>
+            <div class="form-group">
+                <label for="location_year_${locationCount}" class="form-label">Yapım Yılı</label>
+                <input type="text" class="form-control" id="location_year_${locationCount}" name="location_year_${locationCount}">
+            </div>
+            <div class="form-group">
+                <label for="location_detail_${locationCount}" class="form-label">Detay</label>
+                <textarea class="form-control" id="location_detail_${locationCount}" name="location_detail_${locationCount}"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="gallery_${locationCount}" class="form-label">Galeri Resimleri</label>
+                <input type="text" class="form-control" id="gallery_${locationCount}" name="gallery_${locationCount}" placeholder="Resim URL'leri (virgülle ayırın: images/1.jpg,images/2.jpg)">
+            </div>
+            <button type="button" class="btn btn-danger btn-sm" onclick="removeLocation(${locationCount})">Lokasyonu Sil</button>
+        `;
+        document.getElementById('additional-locations').appendChild(locationDiv);
+        document.getElementById('location_count').value = locationCount;
+
+        const additionalMap = L.map(`mini-map-location-${locationCount}`).setView([41.0082, 28.9784], 12);
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(miniMap);
-        setTimeout(() => miniMap.invalidateSize(), 100);
+        }).addTo(additionalMap);
+        additionalMaps[locationCount] = additionalMap;
+        additionalMarkers[locationCount] = null;
 
-        let marker = null;
-        miniMap.on('click', (e) => {
-            if (marker) miniMap.removeLayer(marker);
-            marker = L.marker(e.latlng).addTo(miniMap)
+        additionalMap.on('click', (e) => {
+            if (additionalMarkers[locationCount]) additionalMap.removeLayer(additionalMarkers[locationCount]);
+            additionalMarkers[locationCount] = L.marker(e.latlng).addTo(additionalMap)
                 .bindTooltip(`Seçilen: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`, { direction: 'top', sticky: true });
         });
 
-        function selectLocation() {
-            if (marker) {
-                const lat = marker.getLatLng().lat;
-                const lng = marker.getLatLng().lng;
-                document.getElementById('selectedLat').value = lat;
-                document.getElementById('selectedLng').value = lng;
-                document.getElementById('locationLink').value = `https://maps.google.com/?q=${lat},${lng}`;
-            } else {
-                alert('Lütfen haritadan bir konum seçin!');
-            }
+        setTimeout(() => additionalMap.invalidateSize(), 100);
+    }
+
+    function removeLocation(index) {
+        const locationDiv = document.getElementById(`location-${index}`);
+        if (locationDiv) {
+            locationDiv.remove();
+            delete additionalMaps[index];
+            delete additionalMarkers[index];
+            document.getElementById('location_count').value = document.querySelectorAll('.location-group').length;
         }
+    }
 
-        // Dinamik Ek Lokasyon Haritaları
-        let locationCount = 1;
-        let additionalMaps = {};
-        let additionalMarkers = {};
-
-        // İlk ek lokasyon haritasını başlat
-        const initialMap = L.map('mini-map-location-0').setView([41.0082, 28.9784], 12);
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(initialMap);
-        additionalMaps[0] = initialMap;
-        additionalMarkers[0] = null;
-        initialMap.on('click', (e) => {
-            if (additionalMarkers[0]) initialMap.removeLayer(additionalMarkers[0]);
-            additionalMarkers[0] = L.marker(e.latlng).addTo(initialMap)
-                .bindTooltip(`Seçilen: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`, { direction: 'top', sticky: true });
-        });
-        setTimeout(() => initialMap.invalidateSize(), 100);
-
-        function addLocation() {
-            locationCount++;
-            const locationDiv = document.createElement('div');
-            locationDiv.className = 'location-group';
-            locationDiv.id = `location-${locationCount}`;
-            locationDiv.innerHTML = `
-                <div class="form-group">
-                    <label for="location_name_${locationCount}" class="form-label">Ek Lokasyon Adı</label>
-                    <input type="text" class="form-control" id="location_name_${locationCount}" name="location_name_${locationCount}">
-                </div>
-                <div class="form-group">
-                    <label for="location_link_${locationCount}" class="form-label">Ek Lokasyon Linki</label>
-                    <input type="text" class="form-control" id="location_link_${locationCount}" name="location_link_${locationCount}" placeholder="Örneğin: https://maps.google.com/?q=41.0050,28.9750">
-                    <div id="mini-map-location-${locationCount}" class="mini-map-location"></div>
-                    <button type="button" class="btn-select-location mt-2" onclick="selectLocationForAdditional(${locationCount})">Seç</button>
-                    <input type="hidden" id="selectedLat-${locationCount}" name="selectedLat-${locationCount}">
-                    <input type="hidden" id="selectedLng-${locationCount}" name="selectedLng-${locationCount}">
-                </div>
-                <div class="form-group">
-                    <label for="location_year_${locationCount}" class="form-label">Yapım Yılı</label>
-                    <input type="text" class="form-control" id="location_year_${locationCount}" name="location_year_${locationCount}">
-                </div>
-                <div class="form-group">
-                    <label for="location_detail_${locationCount}" class="form-label">Detay</label>
-                    <textarea class="form-control" id="location_detail_${locationCount}" name="location_detail_${locationCount}"></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="gallery_${locationCount}" class="form-label">Galeri Resimleri</label>
-                    <input type="text" class="form-control" id="gallery_${locationCount}" name="gallery_${locationCount}" placeholder="Resim URL'leri (virgülle ayırın: images/1.jpg,images/2.jpg)">
-                </div>
-                <button type="button" class="btn btn-danger btn-sm" onclick="removeLocation(${locationCount})">Lokasyonu Sil</button>
-            `;
-            document.getElementById('additional-locations').appendChild(locationDiv);
-            document.getElementById('location_count').value = locationCount;
-
-            const additionalMap = L.map(`mini-map-location-${locationCount}`).setView([41.0082, 28.9784], 12);
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            }).addTo(additionalMap);
-            additionalMaps[locationCount] = additionalMap;
-            additionalMarkers[locationCount] = null;
-
-            additionalMap.on('click', (e) => {
-                if (additionalMarkers[locationCount]) additionalMap.removeLayer(additionalMarkers[locationCount]);
-                additionalMarkers[locationCount] = L.marker(e.latlng).addTo(additionalMap)
-                    .bindTooltip(`Seçilen: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`, { direction: 'top', sticky: true });
-            });
-
-            setTimeout(() => additionalMap.invalidateSize(), 100);
+    function selectLocationForAdditional(index) {
+        const additionalMap = additionalMaps[index];
+        const additionalMarker = additionalMarkers[index];
+        if (additionalMarker) {
+            const lat = additionalMarker.getLatLng().lat;
+            const lng = additionalMarker.getLatLng().lng;
+            document.getElementById(`selectedLat-${index}`).value = lat;
+            document.getElementById(`selectedLng-${index}`).value = lng;
+            document.getElementById(`location_link_${index}`).value = `https://maps.google.com/?q=${lat},${lng}`;
+        } else {
+            alert('Lütfen haritadan bir konum seçin!');
         }
+        setTimeout(() => additionalMap.invalidateSize(), 100);
+    }
 
-        function removeLocation(index) {
-            const locationDiv = document.getElementById(`location-${index}`);
-            if (locationDiv) {
-                locationDiv.remove();
-                delete additionalMaps[index];
-                delete additionalMarkers[index];
-                document.getElementById('location_count').value = document.querySelectorAll('.location-group').length;
-            }
-        }
+    // Aile fertleri arama
+    fetch('persons.json')
+        .then(response => {
+            if (!response.ok) throw new Error('persons.json bulunamadı');
+            return response.json();
+        })
+        .then(staticPersons => {
+            const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
+            const persons = [...staticPersons, ...dynamicPersons];
+            console.log('Yüklenen kişiler:', persons);
 
-        function selectLocationForAdditional(index) {
-            const additionalMap = additionalMaps[index];
-            const additionalMarker = additionalMarkers[index];
-            if (additionalMarker) {
-                const lat = additionalMarker.getLatLng().lat;
-                const lng = additionalMarker.getLatLng().lng;
-                document.getElementById(`selectedLat-${index}`).value = lat;
-                document.getElementById(`selectedLng-${index}`).value = lng;
-                document.getElementById(`location_link_${index}`).value = `https://maps.google.com/?q=${lat},${lng}`;
-            } else {
-                alert('Lütfen haritadan bir konum seçin!');
-            }
-            setTimeout(() => additionalMap.invalidateSize(), 100);
-        }
+            const familySearch = document.getElementById('family-search');
+            const familyResults = document.getElementById('family-results');
+            familySearch.addEventListener('input', function() {
+                const query = this.value.toLowerCase();
+                familyResults.innerHTML = '';
 
-        // Aile fertleri arama
-        fetch('persons.json')
-            .then(response => {
-                if (!response.ok) throw new Error('persons.json bulunamadı');
-                return response.json();
-            })
-            .then(staticPersons => {
-                const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
-                const persons = [...staticPersons, ...dynamicPersons];
-                console.log('Yüklenen kişiler:', persons);
-
-                const familySearch = document.getElementById('family-search');
-                const familyResults = document.getElementById('family-results');
-                familySearch.addEventListener('input', function() {
-                    const query = this.value.toLowerCase();
-                    familyResults.innerHTML = '';
-
-                    if (query) {
-                        const matches = persons.filter(person =>
-                            (person.name.toLowerCase().includes(query) ||
-                             person.surname.toLowerCase().includes(query) ||
-                             person.title.toLowerCase().includes(query))
-                        );
-                        if (matches.length > 0) {
-                            matches.forEach(person => {
-                                const div = document.createElement('div');
-                                div.innerHTML = `<img src="${person.profileImage || 'images/default.jpg'}" alt="${person.name}" style="width: 30px; height: 30px; border-radius: 50%;"> <span data-id="${person.id}">${person.name} ${person.surname} (${person.title})</span>`;
-                                div.addEventListener('click', function() {
-                                    const selectedFamily = document.getElementById('selected-family');
-                                    const existing = selectedFamily.querySelectorAll('span[data-id]');
-                                    let exists = false;
-                                    existing.forEach(item => {
-                                        if (item.getAttribute('data-id') === person.id) exists = true;
-                                    });
-                                    if (!exists) {
-                                        const familyItem = document.createElement('div');
-                                        familyItem.className = 'family-item';
-                                        familyItem.innerHTML = `
-                                            <img src="${person.profileImage || 'images/default.jpg'}" alt="Profil">
-                                            <span data-id="${person.id}">${person.name} ${person.surname} (${person.title})</span>
-                                            <input type="text" class="form-control" placeholder="Yakınlık derecesi (örn: kardeşi, kuzen, dede)" onchange="updateFamilyInput()">
-                                            <span class="remove-family" onclick="this.parentElement.remove(); updateFamilyInput()">x</span>
-                                        `;
-                                        selectedFamily.appendChild(familyItem);
-                                        updateFamilyInput();
-                                    }
-                                    familyResults.innerHTML = '';
-                                    familySearch.value = '';
+                if (query) {
+                    const matches = persons.filter(person =>
+                        (person.name.toLowerCase().includes(query) ||
+                         person.surname.toLowerCase().includes(query) ||
+                         person.title.toLowerCase().includes(query))
+                    );
+                    if (matches.length > 0) {
+                        matches.forEach(person => {
+                            const div = document.createElement('div');
+                            div.innerHTML = `<img src="${person.profileImage || 'images/default.jpg'}" alt="${person.name}" style="width: 30px; height: 30px; border-radius: 50%;"> <span data-id="${person.id}">${person.name} ${person.surname} (${person.title})</span>`;
+                            div.addEventListener('click', function() {
+                                const selectedFamily = document.getElementById('selected-family');
+                                const existing = selectedFamily.querySelectorAll('span[data-id]');
+                                let exists = false;
+                                existing.forEach(item => {
+                                    if (item.getAttribute('data-id') === person.id) exists = true;
                                 });
-                                familyResults.appendChild(div);
+                                if (!exists) {
+                                    const familyItem = document.createElement('div');
+                                    familyItem.className = 'family-item';
+                                    familyItem.innerHTML = `
+                                        <img src="${person.profileImage || 'images/default.jpg'}" alt="Profil">
+                                        <span data-id="${person.id}">${person.name} ${person.surname} (${person.title})</span>
+                                        <input type="text" class="form-control" placeholder="Yakınlık derecesi (örn: kardeşi, kuzen, dede)" onchange="updateFamilyInput()">
+                                        <span class="remove-family" onclick="this.parentElement.remove(); updateFamilyInput()">x</span>
+                                    `;
+                                    selectedFamily.appendChild(familyItem);
+                                    updateFamilyInput();
+                                }
+                                familyResults.innerHTML = '';
+                                familySearch.value = '';
                             });
-                        } else {
-                            familyResults.innerHTML = '<div>Aile ferdi henüz eklenmemiş.</div>';
-                        }
+                            familyResults.appendChild(div);
+                        });
+                    } else {
+                        familyResults.innerHTML = '<div>Aile ferdi henüz eklenmemiş.</div>';
                     }
-                });
-            })
-            .catch(error => console.error('persons.json yüklenirken hata:', error));
-
-        function updateFamilyInput() {
-            const selected = document.querySelectorAll('#selected-family .family-item');
-            const familyData = Array.from(selected).map(item => {
-                const span = item.querySelector('span[data-id]');
-                const input = item.querySelector('input');
-                return {
-                    id: span.getAttribute('data-id'),
-                    text: span.textContent,
-                    relation: input.value.trim() || 'diğer'
-                };
+                }
             });
-            document.getElementById('family-input').value = JSON.stringify(familyData);
-        }
+        })
+        .catch(error => console.error('persons.json yüklenirken hata:', error));
 
-  // Türkçe karakterleri Latin harflerine çeviren fonksiyon
+    function updateFamilyInput() {
+        const selected = document.querySelectorAll('#selected-family .family-item');
+        const familyData = Array.from(selected).map(item => {
+            const span = item.querySelector('span[data-id]');
+            const input = item.querySelector('input');
+            return {
+                id: span.getAttribute('data-id'),
+                text: span.textContent,
+                relation: input.value.trim() || 'diğer'
+            };
+        });
+        document.getElementById('family-input').value = JSON.stringify(familyData);
+    }
+
+    // Türkçe karakterleri Latin harflerine çeviren ve adsoyad formatında urlSlug oluşturan fonksiyon
     function createUrlSlug(name, surname) {
         const turkishToLatin = str => str
             .replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i')
             .replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u')
             .replace(/Ç/g, 'C').replace(/Ğ/g, 'G').replace(/İ/g, 'I')
             .replace(/Ö/g, 'O').replace(/Ş/g, 'S').replace(/Ü/g, 'U');
-        return `${turkishToLatin(name.toLowerCase())}+${
-            turkishToLatin(surname.toLowerCase())}`;
+        return `${turkishToLatin(name.toLowerCase())}${turkishToLatin(surname.toLowerCase())}`;
     }
 
     // Form gönderimi
@@ -468,7 +467,9 @@
         };
 
         // Dinamik kişiyi localStorage'a kaydet
-        const dynamicPersons = JSON.parse(localStorage.getItem('dynamic PLEASE Assistant: localStorage`daki `dynamicPersons` ve `familyRelations` verilerini kontrol ederek, silinen kişinin aile ilişkilerinden de çıkarılmasını sağladım. Bu, veri bütünlüğünü korur.
+        const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
+        dynamicPersons.push(newPerson);
+        localStorage.setItem('dynamicPersons', JSON.stringify(dynamicPersons));
 
         // Aile ilişkilerini güncelle
         const familyRelations = JSON.parse(localStorage.getItem('familyRelations') || '{}');
@@ -481,10 +482,11 @@
         localStorage.setItem('familyRelations', JSON.stringify(familyRelations));
 
         alert('Kişi başarıyla eklendi! Profil sayfasına yönlendiriliyorsunuz.');
-        window.location.href = `profile.html?ad=${urlSlug}`;
+        window.location.href = `profile.html?${urlSlug}`;
     });
     </script>
 </body>
 </html>
+
 
 
