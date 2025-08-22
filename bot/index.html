@@ -1,13 +1,77 @@
 <!DOCTYPE html>
-<html lang="en">   
+<html lang="tr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bot Documentation</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="script.js" defer></script>
+<meta charset="UTF-8">
+<title>ETBİS Şirket Listesi</title>
+<style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background: #f2f2f2; }
+    tr:nth-child(even) { background: #fafafa; }
+    .button { display: inline-block; background: #f44336; color: #fff; padding: 10px 15px; text-decoration: none; border-radius: 4px; cursor: pointer; }
+    .button:hover { opacity: 0.8; }
+</style>
 </head>
+<body>
+<h2>ETBİS Şirket Listesi <button class="button" onclick="exportCSV()">Excel Olarak İndir</button></h2>
+<p><strong id="totalRows">Toplam Satır Sayısı: 0</strong></p>
 
+<table id="dataTable">
+<thead>
+<tr>
+    <th>İşletme Unvanı</th>
+    <th>E-Ticaret Sitesi</th>
+    <th>Mobil Uygulama</th>
+    <th>Profil Linki</th>
+</tr>
+</thead>
+<tbody>
+<!-- Veri buraya JS ile eklenecek -->
+</tbody>
+</table>
 
-<h1>HELOOOOOOOOOO</h1>
+<script>
+// Örnek veri (bunu ETBİS verilerini JSON olarak ekleyebilirsin)
+const data = [
+    ["BEZEK TURİSTİK EŞYA SANAYİ VE TİCARET LİMİTED ŞİRKETİ","www.silverpoint.com.tr","silverpoint","https://etbis.ticaret.gov.tr/tr/Home/SearchSiteResult?siteId=d89e0255-0606-4da6-8937"],
+    ["ÖRNEK ŞİRKET","www.ornek.com","ornekapp","https://etbis.ticaret.gov.tr/tr/Home/SearchSiteResult?siteId=xxxx"]
+];
+
+// Tabloyu doldur
+const tbody = document.querySelector("#dataTable tbody");
+data.forEach(row => {
+    const tr = document.createElement("tr");
+    row.forEach((cell, i) => {
+        const td = document.createElement("td");
+        if(i === 3){ // Profil linki
+            td.innerHTML = `<a href="${cell}" target="_blank">Profili Gör</a>`;
+        } else {
+            td.textContent = cell;
+        }
+        tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+});
+
+// Toplam satır sayısı
+document.getElementById("totalRows").textContent = "Toplam Satır Sayısı: " + data.length;
+
+// CSV indirme fonksiyonu
+function exportCSV() {
+    let csvContent = "\uFEFF"; // UTF-8 BOM
+    csvContent += "İşletme Unvanı;E-Ticaret Sitesi;Mobil Uygulama;Profil Linki\n";
+    data.forEach(row => {
+        csvContent += row.join(";") + "\n";
+    });
+
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "etbis_sirketler.csv");
+    link.click();
+}
+</script>
+</body>
 </html>
