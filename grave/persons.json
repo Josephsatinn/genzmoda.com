@@ -1,0 +1,22 @@
+[
+    {
+        "id": 1,
+        "name": "Ahmet",
+        "surname": "Yılmaz",
+        "title": "Prof. Dr.",
+        "profession": "Doktor",
+        "birthDeath": "1970-",
+        "locationLink": "https://www.google.com/maps?q=41.0082,28.9784",
+        "profileImage": "images/ahmet.jpg"
+    },
+    {
+        "id": 2,
+        "name": "Ayşe",
+        "surname": "Kaya",
+        "title": "Mühendis",
+        "profession": "Yazılım Geliştirici",
+        "birthDeath": "1985-",
+        "locationLink": "https://www.google.com/maps?q=39.9334,32.8597",
+        "profileImage": "images/ayse.jpg"
+    }
+]
