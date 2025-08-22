@@ -120,123 +120,141 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
-        // JSON dosyasını ve localStorage'ı yükle
-        fetch('persons.json')
-            .then(response => {
-                if (!response.ok) throw new Error('persons.json bulunamadı');
-                return response.json();
-            })
-            .then(staticPersons => {
-                // localStorage'dan dinamik kişileri al
-                const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
-                const persons = [...staticPersons, ...dynamicPersons].map(person => {
-                    const match = person.locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/);
-                    return {
-                        ...person,
-                        lat: match ? parseFloat(match[1]) : 41.0082, // Varsayılan İstanbul
-                        lng: match ? parseFloat(match[2]) : 28.9784,
-                        urlSlug: person.urlSlug || encodeURIComponent(`${person.name.toLowerCase()}+${person.surname.toLowerCase()}`)
-                    };
+  // Türkçe karakterleri Latin harflerine çeviren fonksiyon
+    function createUrlSlug(name, surname) {
+        const turkishToLatin = str => str
+            .replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i')
+            .replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u')
+            .replace(/Ç/g, 'C').replace(/Ğ/g, 'G').replace(/İ/g, 'I')
+            .replace(/Ö/g, 'O').replace(/Ş/g, 'S').replace(/Ü/g, 'U');
+        return `${turkishToLatin(name.toLowerCase())}+${
+            turkishToLatin(surname.toLowerCase())}`;
+    }
+
+    // JSON dosyasını ve localStorage'ı yükle
+    fetch('persons.json')
+        .then(response => {
+            if (!response.ok) throw new Error('persons.json bulunamadı');
+            return response.json();
+        })
+        .then(staticPersons => {
+            // localStorage'dan dinamik kişileri al
+            const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
+            const persons = [...staticPersons, ...dynamicPersons].map(person => ({
+                ...person,
+                lat: person.locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/) ?
+                    parseFloat(person.locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/)[1]) :
+                    41.0082, // Varsayılan İstanbul
+                lng: person.locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/) ?
+                    parseFloat(person.locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/)[2]) :
+                    28.9784,
+                urlSlug: person.urlSlug || createUrlSlug(person.name, person.surname)
+            }));
+
+            // Harita başlat
+            const map = L.map('map').setView([39, 35], 6);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+
+            // Kişileri haritaya ekle
+            persons.forEach(person => {
+                const markerHtml = `<div class="custom-marker"><img src="${
+                    person.profileImage || 'images/default.jpg'}" alt="${person.name}"></div>`;
+                const customIcon = L.divIcon({
+                    html: markerHtml,
+                    iconSize: [50, 70],
+                    iconAnchor: [25, 70]
                 });
 
-                // Harita başlat
-                const map = L.map('map').setView([39, 35], 6);
-                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                const marker = L.marker([person.lat, person.lng], {
+                    icon: customIcon
                 }).addTo(map);
 
-                // Kişileri haritaya ekle
-                persons.forEach(person => {
-                    const markerHtml = `<div class="custom-marker"><img src="${person.profileImage || 'images/default.jpg'}" alt="${person.name}"></div>`;
-                    const customIcon = L.divIcon({
-                        html: markerHtml,
-                        iconSize: [50, 70],
-                        iconAnchor: [25, 70]
-                    });
-
-                    const marker = L.marker([person.lat, person.lng], {
-                        icon: customIcon
-                    }).addTo(map);
-
-                    marker.bindTooltip(`
-                        <b>${person.name} ${person.surname}</b><br>
-                        ${person.title} - ${person.profession}<br>
-                        ${person.birthDeath}
-                    `, {
-                        direction: 'top',
-                        sticky: true
-                    });
-
-                    marker.on('click', () => {
-                        map.flyTo([person.lat, person.lng], 18, {
-                            animate: true,
-                            duration: 2
-                        });
-                        document.getElementById('details').innerHTML = `
-                            <h2>${person.name} ${person.surname}<a href="profile.html?ad=${person.urlSlug}" class="btn btn-primary">Profile Git</a></h2>
-                            <img src="${person.profileImage || 'images/default.jpg'}" alt="Profil" style="width:200px;">
-                            <p><b>Ünvan:</b> ${person.title}</p>
-                            <p><b>Meslek:</b> ${person.profession}</p>
-                            <p><b>Doğum-Ölüm:</b> ${person.birthDeath}</p>
-                        `;
-                    });
+                marker.bindTooltip(`
+                    <b>${person.name} ${person.surname}</b><br>
+                    ${person.title} - ${person.profession}<br>
+                    ${person.birthDeath}
+                `, {
+                    direction: 'top',
+                    sticky: true
                 });
 
-                // Kişi listesini oluştur
-                const personList = document.getElementById('person-list');
-                persons.forEach(person => {
-                    const div = document.createElement('div');
-                    div.className = 'person-item';
-                    div.setAttribute('data-id', person.id);
-                    div.innerHTML = `
-                        <img src="${person.profileImage || 'images/default.jpg'}" class="person-image" alt="${person.name}">
-                        <div>
-                            <strong><a href="profile.html?ad=${person.urlSlug}">${person.name} ${person.surname}</a></strong><br>
-                            <small>${person.title} (${person.profession}) ${person.birthDeath}</small>
-                        </div>
-                        <button class="delete-btn" onclick="deletePerson(${person.id})">Sil</button>
+                marker.on('click', () => {
+                    map.flyTo([person.lat, person.lng], 18, {
+                        animate: true,
+                        duration: 2
+                    });
+                    document.getElementById('details').innerHTML = `
+                        <h2>${person.name} ${person.surname}<a href="profile.html?ad=${
+                            person.urlSlug}" class="btn btn-primary">Profile Git</a></h2>
+                        <img src="${person.profileImage || 'images/default.jpg'}" alt="Profil" style="width:200px;">
+                        <p><b>Ünvan:</b> ${person.title}</p>
+                        <p><b>Meslek:</b> ${person.profession}</p>
+                        <p><b>Doğum-Ölüm:</b> ${person.birthDeath}</p>
                     `;
-                    div.addEventListener('click', () => {
-                        map.flyTo([person.lat, person.lng], 18, {
-                            animate: true,
-                            duration: 2
-                        });
-                        document.getElementById('details').innerHTML = `
-                            <h2>${person.name} ${person.surname}<a href="profile.html?ad=${person.urlSlug}" class="btn btn-primary">Profile Git</a></h2>
-                            <img src="${person.profileImage || 'images/default.jpg'}" alt="Profil" style="width:200px;">
-                            <p><b>Ünvan:</b> ${person.title}</p>
-                            <p><b>Meslek:</b> ${person.profession}</p>
-                            <p><b>Doğum-Ölüm:</b> ${person.birthDeath}</p>
-                        `;
-                    });
-                    personList.appendChild(div);
                 });
-            })
-            .catch(error => {
-                console.error('JSON yüklenirken hata:', error);
-                document.getElementById('person-list').innerHTML = '<p>Kişiler yüklenirken hata oluştu.</p>';
             });
 
-        // Dinamik kişiyi silme
-        function deletePerson(id) {
-            const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
-            const updatedPersons = dynamicPersons.filter(person => person.id !== id);
-            localStorage.setItem('dynamicPersons', JSON.stringify(updatedPersons));
-
-            // Aile ilişkilerinden de sil
-            const familyRelations = JSON.parse(localStorage.getItem('familyRelations') || '{}');
-            delete familyRelations[id];
-            Object.keys(familyRelations).forEach(key => {
-                if (familyRelations[key][id]) {
-                    delete familyRelations[key][id];
-                }
+            // Kişi listesini oluştur
+            const personList = document.getElementById('person-list');
+            persons.forEach(person => {
+                const div = document.createElement('div');
+                div.className = 'person-item';
+                div.setAttribute('data-id', person.id);
+                div.innerHTML = `
+                    <img src="${person.profileImage || 'images/default.jpg'}" class="person-image" alt="${
+                        person.name}">
+                    <div>
+                        <strong><a href="profile.html?ad=${person.urlSlug}">${
+                            person.name} ${person.surname}</a></strong><br>
+                        <small>${person.title} (${person.profession}) ${person.birthDeath}</small>
+                    </div>
+                    <button class="delete-btn" onclick="deletePerson(${person.id})">Sil</button>
+                `;
+                div.addEventListener('click', () => {
+                    map.flyTo([person.lat, person.lng], 18, {
+                        animate: true,
+                        duration: 2
+                    });
+                    document.getElementById('details').innerHTML = `
+                        <h2>${person.name} ${person.surname}<a href="profile.html?ad=${
+                            person.urlSlug}" class="btn btn-primary">Profile Git</a></h2>
+                        <img src="${person.profileImage || 'images/default.jpg'}" alt="Profil" style="width:200px;">
+                        <p><b>Ünvan:</b> ${person.title}</p>
+                        <p><b>Meslek:</b> ${person.profession}</p>
+                        <p><b>Doğum-Ölüm:</b> ${person.birthDeath}</p>
+                    `;
+                });
+                personList.appendChild(div);
             });
-            localStorage.setItem('familyRelations', JSON.stringify(familyRelations));
+        })
+        .catch(error => {
+            console.error('JSON yüklenirken hata:', error);
+            document.getElementById('person-list').innerHTML = '<p>Kişiler yüklenirken hata oluştu.</p>';
+        });
 
-            alert(`Kişi (ID: ${id}) silindi. Sayfayı yenileyin.`);
-            window.location.reload();
-        }
+    // Dinamik kişiyi silme
+    function deletePerson(id) {
+        const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
+        const updatedPersons = dynamicPersons.filter(person => person.id !== id);
+        localStorage.setItem('dynamicPersons', JSON.stringify(updatedPersons));
+
+        // Aile ilişkilerinden de sil
+        const familyRelations = JSON.parse(localStorage.getItem('familyRelations') || '{}');
+        delete familyRelations[id];
+        Object.keys(familyRelations).forEach(key => {
+            if (familyRelations[key][id]) {
+                delete familyRelations[key][id];
+            }
+        });
+        localStorage.setItem('familyRelations', JSON.stringify(familyRelations));
+
+        alert(`Kişi (ID: ${id}) silindi. Sayfayı yenileyin.`);
+        window.location.reload();
+    }
     </script>
 </body>
 </html>
+
