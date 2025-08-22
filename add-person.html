@@ -310,7 +310,11 @@
         // Aile fertleri arama (ad, soyad ve ünvan ile)
         fetch('persons.json')
             .then(response => response.json())
-            .then(persons => {
+            .then(staticPersons => {
+                // localStorage'dan dinamik kişileri al
+                const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
+                const persons = [...staticPersons, ...dynamicPersons];
+
                 const familySearch = document.getElementById('family-search');
                 const familyResults = document.getElementById('family-results');
                 familySearch.addEventListener('input', function() {
@@ -392,18 +396,13 @@
                 family: JSON.parse(formData.get('family') || '[]')
             };
 
-            // GitHub Pages statik olduğu için JSON'u alert ile göster
-            alert('GitHub Pages statik olduğu için ekleme işlemi yapılamıyor. Aşağıdaki JSON verisini kopyalayıp persons.json dosyasına ekleyin:\n\n' + JSON.stringify(newPerson, null, 2));
+            // Dinamik kişiyi localStorage'a kaydet
+            const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
+            dynamicPersons.push(newPerson);
+            localStorage.setItem('dynamicPersons', JSON.stringify(dynamicPersons));
 
-            // Backend ile ekleme (örnek, aktif değil):
-            /*
-            await fetch('https://your-backend-api/add-person', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(newPerson)
-            });
+            alert('Kişi başarıyla eklendi! index.html sayfasında görünecek. Kalıcı saklama için persons.json dosyasını güncelleyin veya bir backend kullanın:\n\n' + JSON.stringify(newPerson, null, 2));
             window.location.href = 'index.html';
-            */
         });
     </script>
 </body>
