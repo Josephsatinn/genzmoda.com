@@ -17,7 +17,7 @@ concurrency:
 jobs:
   deploy:
     environment:
-      name: github-pages
+      name: github-page
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
@@ -30,7 +30,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path:  './genzmoda'            # Tüm repo kökünü deploy et
+          path:  './bot'            # Tüm repo kökünü deploy et
           name: github-pages
           retention-days: 1
 
