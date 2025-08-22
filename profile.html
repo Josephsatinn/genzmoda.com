@@ -136,7 +136,7 @@
 
         // URL'den id parametresini al
         const urlParams = new URLSearchParams(window.location.search);
-        const id = parseInt(urlParams.get('id'));
+        const id = parseInt(urlParams.get('id')) || 0;
 
         // Verileri yükle
         fetch('persons.json')
