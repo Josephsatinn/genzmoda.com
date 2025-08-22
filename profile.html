@@ -141,9 +141,10 @@
             return [lat, lon];
         }
 
-        // URL'den id parametresini al
+        // URL'den ad veya id parametresini al
         const urlParams = new URLSearchParams(window.location.search);
-        const id = parseInt(urlParams.get('id')) || 0;
+        const urlSlug = urlParams.get('ad');
+        const id = parseInt(urlParams.get('id'));
 
         // Verileri yükle
         fetch('persons.json')
@@ -155,12 +156,22 @@
                 const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
                 const persons = [...staticPersons, ...dynamicPersons];
                 console.log('Yüklenen kişiler:', persons); // Hata ayıklama için
-                const person = persons.find(p => p.id === id);
+
+                let person;
+                if (urlSlug) {
+                    person = persons.find(p => p.urlSlug === urlSlug);
+                    if (!person) {
+                        // Aynı urlSlug'a sahip birden fazla kişi varsa, en son ekleneni seç
+                        person = persons.filter(p => p.urlSlug === urlSlug).pop();
+                    }
+                } else if (id) {
+                    person = persons.find(p => p.id === id);
+                }
 
                 if (!person) {
                     document.getElementById('details').innerHTML = '<p>Kişi bulunamadı.</p>';
                     document.title = 'Kişi Bulunamadı';
-                    console.error(`ID ${id} için kişi bulunamadı.`);
+                    console.error(`URL slug ${urlSlug} veya ID ${id} için kişi bulunamadı.`);
                     return;
                 }
 
@@ -199,7 +210,7 @@
 
                 // Aile ilişkilerini haritaya ekle
                 const familyRelations = JSON.parse(localStorage.getItem('familyRelations') || '{}');
-                const family = familyRelations[id] || {};
+                const family = familyRelations[person.id] || {};
                 console.log('Aile ilişkileri:', family); // Hata ayıklama için
                 persons.forEach(familyPerson => {
                     if (family[familyPerson.id]) {
@@ -216,7 +227,7 @@
                             .bindTooltip(`${relation}: ${familyPerson.name}`, { direction: 'top', sticky: true });
                         L.polyline([coords, familyCoords], { color: 'red' }).addTo(map);
                         familyMarker.on('click', () => {
-                            window.location.href = `profile.html?id=${familyPerson.id}`;
+                            window.location.href = `profile.html?ad=${familyPerson.urlSlug || encodeURIComponent(`${familyPerson.name.toLowerCase()}+${familyPerson.surname.toLowerCase()}`)}`;
                         });
                     }
                 });
