@@ -110,6 +110,9 @@
         .family-item span {
             flex-grow: 1;
         }
+        .family-item select {
+            width: 150px;
+        }
         .remove-family {
             cursor: pointer;
             color: red;
@@ -367,15 +370,27 @@
                                 div.innerHTML = `<img src="${person.profileImage || 'images/default.jpg'}" alt="${person.name}" style="width: 30px; height: 30px; border-radius: 50%;"> <span data-id="${person.id}">${person.name} ${person.surname} (${person.title})</span>`;
                                 div.addEventListener('click', function() {
                                     const selectedFamily = document.getElementById('selected-family');
-                                    const existing = selectedFamily.querySelectorAll('span');
+                                    const existing = selectedFamily.querySelectorAll('span[data-id]');
                                     let exists = false;
                                     existing.forEach(item => {
-                                        if (item.textContent === `${person.name} ${person.surname} (${person.title})`) exists = true;
+                                        if (item.getAttribute('data-id') === person.id) exists = true;
                                     });
                                     if (!exists) {
                                         const familyItem = document.createElement('div');
                                         familyItem.className = 'family-item';
-                                        familyItem.innerHTML = `<img src="${person.profileImage || 'images/default.jpg'}" alt="Profil"> <span data-id="${person.id}">${person.name} ${person.surname} (${person.title})</span> <span class="remove-family" onclick="this.parentElement.remove(); updateFamilyInput()">x</span>`;
+                                        familyItem.innerHTML = `
+                                            <img src="${person.profileImage || 'images/default.jpg'}" alt="Profil">
+                                            <span data-id="${person.id}">${person.name} ${person.surname} (${person.title})</span>
+                                            <select class="form-control" onchange="updateFamilyInput()">
+                                                <option value="eşi">Eşi</option>
+                                                <option value="kardeşi">Kardeşi</option>
+                                                <option value="anne">Anne</option>
+                                                <option value="baba">Baba</option>
+                                                <option value="çocuk">Çocuk</option>
+                                                <option value="diğer">Diğer</option>
+                                            </select>
+                                            <span class="remove-family" onclick="this.parentElement.remove(); updateFamilyInput()">x</span>
+                                        `;
                                         selectedFamily.appendChild(familyItem);
                                         updateFamilyInput();
                                     }
@@ -393,11 +408,16 @@
             .catch(error => console.error('persons.json yüklenirken hata:', error));
 
         function updateFamilyInput() {
-            const selected = document.querySelectorAll('#selected-family .family-item span');
-            const familyData = Array.from(selected).map(span => ({
-                id: span.getAttribute('data-id'),
-                text: span.textContent
-            }));
+            const selected = document.querySelectorAll('#selected-family .family-item');
+            const familyData = Array.from(selected).map(item => {
+                const span = item.querySelector('span[data-id]');
+                const select = item.querySelector('select');
+                return {
+                    id: span.getAttribute('data-id'),
+                    text: span.textContent,
+                    relation: select.value
+                };
+            });
             document.getElementById('family-input').value = JSON.stringify(familyData);
         }
 
@@ -442,9 +462,9 @@
             const familyRelations = JSON.parse(localStorage.getItem('familyRelations') || '{}');
             familyRelations[newPerson.id] = {};
             newPerson.family.forEach(familyMember => {
-                familyRelations[newPerson.id][familyMember.id] = 'aile ferdi';
+                familyRelations[newPerson.id][familyMember.id] = familyMember.relation;
                 if (!familyRelations[familyMember.id]) familyRelations[familyMember.id] = {};
-                familyRelations[familyMember.id][newPerson.id] = 'aile ferdi';
+                familyRelations[familyMember.id][newPerson.id] = familyMember.relation;
             });
             localStorage.setItem('familyRelations', JSON.stringify(familyRelations));
 
