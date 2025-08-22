@@ -101,6 +101,9 @@
             gap: 10px;
             align-items: center;
             margin-bottom: 10px;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
         }
         .family-item img {
             width: 30px;
@@ -110,8 +113,9 @@
         .family-item span {
             flex-grow: 1;
         }
-        .family-item select {
+        .family-item input {
             width: 150px;
+            border: 2px solid #007bff;
         }
         .remove-family {
             cursor: pointer;
@@ -167,7 +171,7 @@
                         <!-- Aile Fertleri Alanı -->
                         <div class="form-group">
                             <h4>Aile Fertleri</h4>
-                            <input type="text" class="form-control" id="family-search" placeholder="Aile ferdi ara...">
+                            <input type="text" class="form-control" id="family-search" placeholder="Aile ferdi ara (örn: Ahmet), ardından yakınlık derecesi gir">
                             <div id="family-results"></div>
                             <div id="selected-family" class="mt-3"></div>
                             <input type="hidden" name="family" id="family-input">
@@ -381,14 +385,7 @@
                                         familyItem.innerHTML = `
                                             <img src="${person.profileImage || 'images/default.jpg'}" alt="Profil">
                                             <span data-id="${person.id}">${person.name} ${person.surname} (${person.title})</span>
-                                            <select class="form-control" onchange="updateFamilyInput()">
-                                                <option value="eşi">Eşi</option>
-                                                <option value="kardeşi">Kardeşi</option>
-                                                <option value="anne">Anne</option>
-                                                <option value="baba">Baba</option>
-                                                <option value="çocuk">Çocuk</option>
-                                                <option value="diğer">Diğer</option>
-                                            </select>
+                                            <input type="text" class="form-control" placeholder="Yakınlık derecesi (örn: kardeşi)" onchange="updateFamilyInput()">
                                             <span class="remove-family" onclick="this.parentElement.remove(); updateFamilyInput()">x</span>
                                         `;
                                         selectedFamily.appendChild(familyItem);
@@ -411,11 +408,11 @@
             const selected = document.querySelectorAll('#selected-family .family-item');
             const familyData = Array.from(selected).map(item => {
                 const span = item.querySelector('span[data-id]');
-                const select = item.querySelector('select');
+                const input = item.querySelector('input');
                 return {
                     id: span.getAttribute('data-id'),
                     text: span.textContent,
-                    relation: select.value
+                    relation: input.value.trim() || 'diğer'
                 };
             });
             document.getElementById('family-input').value = JSON.stringify(familyData);
