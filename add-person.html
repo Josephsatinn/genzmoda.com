@@ -198,6 +198,7 @@
                                     <label for="gallery_0" class="form-label">Galeri Resimleri</label>
                                     <input type="text" class="form-control" id="gallery_0" name="gallery_0" placeholder="Resim URL'leri (virgülle ayırın: images/1.jpg,images/2.jpg)">
                                 </div>
+                                <button type="button" class="btn btn-danger btn-sm" onclick="removeLocation(0)">Lokasyonu Sil</button>
                             </div>
                         </div>
                         <button type="button" class="btn-add-location mt-3" onclick="addLocation()">+</button>
@@ -219,11 +220,13 @@
             maxZoom: 19,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(miniMap);
+        setTimeout(() => miniMap.invalidateSize(), 100); // Harita boyutunu güncelle
 
         let marker = null;
         miniMap.on('click', (e) => {
             if (marker) miniMap.removeLayer(marker);
-            marker = L.marker(e.latlng).addTo(miniMap);
+            marker = L.marker(e.latlng).addTo(miniMap)
+                .bindTooltip(`Seçilen: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`, { direction: 'top', sticky: true });
         });
 
         function selectLocation() {
@@ -238,10 +241,26 @@
             }
         }
 
-        // Dinamik Ek Lokasyon Ekleme
+        // Dinamik Ek Lokasyon Haritaları
         let locationCount = 1;
-        let additionalMaps = [];
-        let additionalMarkers = [];
+        let additionalMaps = {};
+        let additionalMarkers = {};
+
+        // İlk ek lokasyon haritasını başlat
+        const initialMap = L.map('mini-map-location-0').setView([41.0082, 28.9784], 12);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(initialMap);
+        additionalMaps[0] = initialMap;
+        additionalMarkers[0] = null;
+        initialMap.on('click', (e) => {
+            if (additionalMarkers[0]) initialMap.removeLayer(additionalMarkers[0]);
+            additionalMarkers[0] = L.marker(e.latlng).addTo(initialMap)
+                .bindTooltip(`Seçilen: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`, { direction: 'top', sticky: true });
+        });
+        setTimeout(() => initialMap.invalidateSize(), 100); // İlk harita için boyut güncelleme
+
         function addLocation() {
             locationCount++;
             const locationDiv = document.createElement('div');
@@ -272,25 +291,39 @@
                     <label for="gallery_${locationCount}" class="form-label">Galeri Resimleri</label>
                     <input type="text" class="form-control" id="gallery_${locationCount}" name="gallery_${locationCount}" placeholder="Resim URL'leri (virgülle ayırın: images/1.jpg,images/2.jpg)">
                 </div>
+                <button type="button" class="btn btn-danger btn-sm" onclick="removeLocation(${locationCount})">Lokasyonu Sil</button>
             `;
             document.getElementById('additional-locations').appendChild(locationDiv);
             document.getElementById('location_count').value = locationCount;
 
             // Yeni mini harita oluştur
-            const additionalMap = L.map('mini-map-location-' + locationCount).setView([41.0082, 28.9784], 12);
+            const additionalMap = L.map(`mini-map-location-${locationCount}`).setView([41.0082, 28.9784], 12);
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
                 attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             }).addTo(additionalMap);
             additionalMaps[locationCount] = additionalMap;
+            additionalMarkers[locationCount] = null;
 
             // Yeni harita için tıklama eventi
-            let additionalMarker = null;
             additionalMap.on('click', (e) => {
-                if (additionalMarker) additionalMap.removeLayer(additionalMarker);
-                additionalMarker = L.marker(e.latlng).addTo(additionalMap);
-                additionalMarkers[locationCount] = additionalMarker;
+                if (additionalMarkers[locationCount]) additionalMap.removeLayer(additionalMarkers[locationCount]);
+                additionalMarkers[locationCount] = L.marker(e.latlng).addTo(additionalMap)
+                    .bindTooltip(`Seçilen: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`, { direction: 'top', sticky: true });
             });
+
+            // Harita boyutunu güncelle
+            setTimeout(() => additionalMap.invalidateSize(), 100);
+        }
+
+        function removeLocation(index) {
+            const locationDiv = document.getElementById(`location-${index}`);
+            if (locationDiv) {
+                locationDiv.remove();
+                delete additionalMaps[index];
+                delete additionalMarkers[index];
+                document.getElementById('location_count').value = document.querySelectorAll('.location-group').length;
+            }
         }
 
         function selectLocationForAdditional(index) {
@@ -299,21 +332,26 @@
             if (additionalMarker) {
                 const lat = additionalMarker.getLatLng().lat;
                 const lng = additionalMarker.getLatLng().lng;
-                document.getElementById('selectedLat-' + index).value = lat;
-                document.getElementById('selectedLng-' + index).value = lng;
-                document.getElementById('location_link_' + index).value = `https://maps.google.com/?q=${lat},${lng}`;
+                document.getElementById(`selectedLat-${index}`).value = lat;
+                document.getElementById(`selectedLng-${index}`).value = lng;
+                document.getElementById(`location_link_${index}`).value = `https://maps.google.com/?q=${lat},${lng}`;
             } else {
                 alert('Lütfen haritadan bir konum seçin!');
             }
+            // Harita boyutunu tekrar güncelle
+            setTimeout(() => additionalMap.invalidateSize(), 100);
         }
 
         // Aile fertleri arama (ad, soyad ve ünvan ile)
         fetch('persons.json')
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('persons.json bulunamadı');
+                return response.json();
+            })
             .then(staticPersons => {
-                // localStorage'dan dinamik kişileri al
                 const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
                 const persons = [...staticPersons, ...dynamicPersons];
+                console.log('Yüklenen kişiler:', persons); // Hata ayıklama için
 
                 const familySearch = document.getElementById('family-search');
                 const familyResults = document.getElementById('family-results');
@@ -374,10 +412,10 @@
                 const locationName = formData.get(`location_name_${i}`);
                 if (locationName) {
                     additionalLocations[locationName] = [
-                        formData.get(`location_link_${i}`),
-                        formData.get(`location_year_${i}`),
-                        formData.get(`location_detail_${i}`),
-                        formData.get(`gallery_${i}`)?.split(',').map(url => url.trim()) || []
+                        formData.get(`location_link_${i}`) || `https://maps.google.com/?q=41.0082,28.9784`,
+                        formData.get(`location_year_${i}`) || '',
+                        formData.get(`location_detail_${i}`) || '',
+                        formData.get(`gallery_${i}`)?.split(',').map(url => url.trim()).filter(url => url) || []
                     ];
                 }
             }
@@ -389,7 +427,7 @@
                 title: formData.get('title'),
                 profession: formData.get('profession'),
                 birthDeath: formData.get('birthDeath'),
-                locationLink: formData.get('locationLink'),
+                locationLink: formData.get('locationLink') || 'https://maps.google.com/?q=41.0082,28.9784',
                 profileImage: formData.get('profileImage'),
                 coverImage: formData.get('coverImage'),
                 additionalLocations,
