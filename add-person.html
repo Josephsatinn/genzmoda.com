@@ -418,74 +418,73 @@
             document.getElementById('family-input').value = JSON.stringify(familyData);
         }
 
-      // Türkçe karakterleri Latin harflerine çeviren fonksiyon
-function createUrlSlug(name, surname) {
-    const turkishToLatin = str => str
-        .replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i')
-        .replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u')
-        .replace(/Ç/g, 'C').replace(/Ğ/g, 'G').replace(/İ/g, 'I')
-        .replace(/Ö/g, 'O').replace(/Ş/g, 'S').replace(/Ü/g, 'U');
-    return `${turkishToLatin(name.toLowerCase())}+${
-        turkishToLatin(surname.toLowerCase())}`;
-}
-
-// Form gönderimi
-document.getElementById('add-person-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const additionalLocations = {};
-    const locationCount = parseInt(formData.get('location_count'));
-    for (let i = 0; i < locationCount; i++) {
-        const locationName = formData.get(`location_name_${i}`);
-        if (locationName) {
-            additionalLocations[locationName] = [
-                formData.get(`location_link_${i}`) || `https://maps.google.com/?q=41.0082,28.9784`,
-                formData.get(`location_year_${i}`) || '',
-                formData.get(`location_detail_${i}`) || '',
-                formData.get(`gallery_${i}`)?.split(',').map(url => url.trim()).filter(url => url) || []
-            ];
-        }
+  // Türkçe karakterleri Latin harflerine çeviren fonksiyon
+    function createUrlSlug(name, surname) {
+        const turkishToLatin = str => str
+            .replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i')
+            .replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u')
+            .replace(/Ç/g, 'C').replace(/Ğ/g, 'G').replace(/İ/g, 'I')
+            .replace(/Ö/g, 'O').replace(/Ş/g, 'S').replace(/Ü/g, 'U');
+        return `${turkishToLatin(name.toLowerCase())}+${
+            turkishToLatin(surname.toLowerCase())}`;
     }
 
-    // Ad ve soyadı al, urlSlug oluştur
-    const name = formData.get('name').trim();
-    const surname = formData.get('surname').trim();
-    const urlSlug = createUrlSlug(name, surname);
+    // Form gönderimi
+    document.getElementById('add-person-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const additionalLocations = {};
+        const locationCount = parseInt(formData.get('location_count'));
+        for (let i = 0; i < locationCount; i++) {
+            const locationName = formData.get(`location_name_${i}`);
+            if (locationName) {
+                additionalLocations[locationName] = [
+                    formData.get(`location_link_${i}`) || `https://maps.google.com/?q=41.0082,28.9784`,
+                    formData.get(`location_year_${i}`) || '',
+                    formData.get(`location_detail_${i}`) || '',
+                    formData.get(`gallery_${i}`)?.split(',').map(url => url.trim()).filter(url => url) || []
+                ];
+            }
+        }
 
-    const newPerson = {
-        id: Date.now(),
-        urlSlug: urlSlug,
-        name: name,
-        surname: surname,
-        title: formData.get('title'),
-        profession: formData.get('profession'),
-        birthDeath: formData.get('birthDeath'),
-        locationLink: formData.get('locationLink') || 'https://maps.google.com/?q=41.0082,28.9784',
-        profileImage: formData.get('profileImage'),
-        coverImage: formData.get('coverImage'),
-        additionalLocations,
-        family: JSON.parse(formData.get('family') || '[]')
-    };
+        // Ad ve soyadı al, urlSlug oluştur
+        const name = formData.get('name').trim();
+        const surname = formData.get('surname').trim();
+        const urlSlug = createUrlSlug(name, surname);
 
-    // Dinamik kişiyi localStorage'a kaydet
-    const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
-    dynamicPersons.push(newPerson);
-    localStorage.setItem('dynamicPersons', JSON.stringify(dynamicPersons));
+        const newPerson = {
+            id: Date.now(),
+            urlSlug: urlSlug,
+            name: name,
+            surname: surname,
+            title: formData.get('title'),
+            profession: formData.get('profession'),
+            birthDeath: formData.get('birthDeath'),
+            locationLink: formData.get('locationLink') || 'https://maps.google.com/?q=41.0082,28.9784',
+            profileImage: formData.get('profileImage'),
+            coverImage: formData.get('coverImage'),
+            additionalLocations,
+            family: JSON.parse(formData.get('family') || '[]')
+        };
 
-    // Aile ilişkilerini güncelle
-    const familyRelations = JSON.parse(localStorage.getItem('familyRelations') || '{}');
-    familyRelations[newPerson.id] = {};
-    newPerson.family.forEach(familyMember => {
-        familyRelations[newPerson.id][familyMember.id] = familyMember.relation;
-        if (!familyRelations[familyMember.id]) familyRelations[familyMember.id] = {};
-        familyRelations[familyMember.id][newPerson.id] = familyMember.relation;
+        // Dinamik kişiyi localStorage'a kaydet
+        const dynamicPersons = JSON.parse(localStorage.getItem('dynamic PLEASE Assistant: localStorage`daki `dynamicPersons` ve `familyRelations` verilerini kontrol ederek, silinen kişinin aile ilişkilerinden de çıkarılmasını sağladım. Bu, veri bütünlüğünü korur.
+
+        // Aile ilişkilerini güncelle
+        const familyRelations = JSON.parse(localStorage.getItem('familyRelations') || '{}');
+        familyRelations[newPerson.id] = {};
+        newPerson.family.forEach(familyMember => {
+            familyRelations[newPerson.id][familyMember.id] = familyMember.relation;
+            if (!familyRelations[familyMember.id]) familyRelations[familyMember.id] = {};
+            familyRelations[familyMember.id][newPerson.id] = familyMember.relation;
+        });
+        localStorage.setItem('familyRelations', JSON.stringify(familyRelations));
+
+        alert('Kişi başarıyla eklendi! Profil sayfasına yönlendiriliyorsunuz.');
+        window.location.href = `profile.html?ad=${urlSlug}`;
     });
-    localStorage.setItem('familyRelations', JSON.stringify(familyRelations));
-
-    alert('Kişi başarıyla eklendi! Profil sayfasına yönlendiriliyorsunuz.');
-    window.location.href = `profile.html?ad=${urlSlug}`;
-});
     </script>
 </body>
 </html>
+
 
