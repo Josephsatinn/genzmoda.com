@@ -28,7 +28,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './main' # Yalnızca main/ klasörünü yayınla
+          path: './main-docs' # Yalnızca main-docs/ klasörünü yayınla
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
