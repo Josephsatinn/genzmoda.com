@@ -385,7 +385,7 @@
                                         familyItem.innerHTML = `
                                             <img src="${person.profileImage || 'images/default.jpg'}" alt="Profil">
                                             <span data-id="${person.id}">${person.name} ${person.surname} (${person.title})</span>
-                                            <input type="text" class="form-control" placeholder="Yakınlık derecesi (örn: kardeşi)" onchange="updateFamilyInput()">
+                                            <input type="text" class="form-control" placeholder="Yakınlık derecesi (örn: kardeşi, kuzen, dede)" onchange="updateFamilyInput()">
                                             <span class="remove-family" onclick="this.parentElement.remove(); updateFamilyInput()">x</span>
                                         `;
                                         selectedFamily.appendChild(familyItem);
@@ -436,10 +436,16 @@
                 }
             }
 
+            // Ad ve soyadı birleştirip URL slug oluştur
+            const name = formData.get('name').trim();
+            const surname = formData.get('surname').trim();
+            const urlSlug = encodeURIComponent(`${name.toLowerCase()}+${surname.toLowerCase()}`);
+
             const newPerson = {
                 id: Date.now(),
-                name: formData.get('name'),
-                surname: formData.get('surname'),
+                urlSlug: urlSlug,
+                name: name,
+                surname: surname,
                 title: formData.get('title'),
                 profession: formData.get('profession'),
                 birthDeath: formData.get('birthDeath'),
@@ -465,10 +471,9 @@
             });
             localStorage.setItem('familyRelations', JSON.stringify(familyRelations));
 
-            alert('Kişi başarıyla eklendi! index.html sayfasında görünecek. Kalıcı saklama için persons.json dosyasını güncelleyin veya bir backend kullanın:\n\n' + JSON.stringify(newPerson, null, 2));
-            window.location.href = 'index.html';
+            alert('Kişi başarıyla eklendi! Profil sayfasına yönlendiriliyorsunuz:\n\n' + JSON.stringify(newPerson, null, 2));
+            window.location.href = `profile.html?ad=${urlSlug}`;
         });
     </script>
 </body>
 </html>
-
