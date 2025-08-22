@@ -121,167 +121,193 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
-        // Koordinatları linkten çıkarma fonksiyonu
-        function getCoordinates(locationLink) {
-            if (!locationLink) {
-                console.warn('Location link eksik, varsayılan koordinatlar kullanılıyor.');
-                return [41.0082, 28.9784]; // Varsayılan İstanbul
-            }
-            const match = locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/);
-            if (!match) {
-                console.warn(`Geçersiz locationLink formatı: ${locationLink}`);
-                return [41.0082, 28.9784]; // Varsayılan İstanbul
-            }
-            const lat = parseFloat(match[1]);
-            const lon = parseFloat(match[2]);
-            if (isNaN(lat) || isNaN(lon)) {
-                console.warn(`Geçersiz koordinatlar: ${locationLink}`);
-                return [41.0082, 28.9784]; // Varsayılan İstanbul
-            }
-            return [lat, lon];
+     // Koordinatları linkten çıkarma fonksiyonu
+    function getCoordinates(locationLink) {
+        if (!locationLink) {
+            console.warn('Location link eksik, varsayılan koordinatlar kullanılıyor.');
+            return [41.0082, 28.9784]; // Varsayılan İstanbul
         }
+        const match = locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/);
+        if (!match) {
+            console.warn(`Geçersiz locationLink formatı: ${locationLink}`);
+            return [41.0082, 28.9784]; // Varsayılan İstanbul
+        }
+        const lat = parseFloat(match[1]);
+        const lon = parseFloat(match[2]);
+        if (isNaN(lat) || isNaN(lon)) {
+            console.warn(`Geçersiz koordinatlar: ${locationLink}`);
+            return [41.0082, 28.9784]; // Varsayılan İstanbul
+        }
+        return [lat, lon];
+    }
 
-        // URL'den ad veya id parametresini al
-        const urlParams = new URLSearchParams(window.location.search);
-        const urlSlug = urlParams.get('ad');
-        const id = parseInt(urlParams.get('id'));
+    // Türkçe karakterleri Latin harflerine çeviren fonksiyon
+    function createUrlSlug(name, surname) {
+        const turkishToLatin = str => str
+            .replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i')
+            .replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u')
+            .replace(/Ç/g, 'C').replace(/Ğ/g, 'G').replace(/İ/g, 'I')
+            .replace(/Ö/g, 'O').replace(/Ş/g, 'S').replace(/Ü/g, 'U');
+        return `${turkishToLatin(name.toLowerCase())}+${
+            turkishToLatin(surname.toLowerCase())}`;
+    }
 
-        // Verileri yükle
-        fetch('persons.json')
-            .then(response => {
-                if (!response.ok) throw new Error('persons.json bulunamadı');
-                return response.json();
-            })
-            .then(staticPersons => {
-                const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
-                const persons = [...staticPersons, ...dynamicPersons];
-                console.log('Yüklenen kişiler:', persons); // Hata ayıklama için
+    // URL'den ad veya id parametresini al
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlSlug = urlParams.get('ad');
+    const id = parseInt(urlParams.get('id'));
 
-                let person;
-                if (urlSlug) {
-                    person = persons.find(p => p.urlSlug === urlSlug);
-                    if (!person) {
-                        // Aynı urlSlug'a sahip birden fazla kişi varsa, en son ekleneni seç
-                        person = persons.filter(p => p.urlSlug === urlSlug).pop();
-                    }
-                } else if (id) {
-                    person = persons.find(p => p.id === id);
-                }
+    // Verileri yükle
+    fetch('persons.json')
+        .then(response => {
+            if (!response.ok) throw new Error('persons.json bulunamadı');
+            return response.json();
+        })
+        .then(staticPersons => {
+            const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
+            const persons = [...staticPersons, ...dynamicPersons].map(person => ({
+                ...person,
+                urlSlug: person.urlSlug || createUrlSlug(person.name, person.surname)
+            }));
+            console.log('Yüklenen kişiler:', persons); // Hata ayıklama için
 
+            let person;
+            if (urlSlug) {
+                person = persons.find(p => p.urlSlug === urlSlug);
                 if (!person) {
-                    document.getElementById('details').innerHTML = '<p>Kişi bulunamadı.</p>';
-                    document.title = 'Kişi Bulunamadı';
-                    console.error(`URL slug ${urlSlug} veya ID ${id} için kişi bulunamadı.`);
-                    return;
+                    // Aynı urlSlug'a sahip birden fazla kişi varsa, en son ekleneni seç
+                    person = persons.filter(p => p.urlSlug === urlSlug).pop();
                 }
+            } else if (id) {
+                person = persons.find(p => p.id === id);
+            }
 
-                // Başlık, kapak ve profil resmi
-                document.title = `${person.name} ${person.surname} Profili`;
-                document.getElementById('cover').style.backgroundImage = `url('${person.coverImage || 'images/default.jpg'}')`;
-                document.getElementById('profile-img').src = person.profileImage || 'images/default.jpg';
+            if (!person) {
+                document.getElementById('details').innerHTML = '<p>Kişi bulunamadı.</p>';
+                document.title = 'Kişi Bulunamadı';
+                console.error(`URL slug ${urlSlug} veya ID ${id} için kişi bulunamadı.`);
+                return;
+            }
 
-                // Detayları göster
-                document.getElementById('details').innerHTML = `
-                    <h2>${person.name} ${person.surname}</h2>
-                    <p><b>Ünvan:</b> ${person.title || 'Belirtilmemiş'}</p>
-                    <p><b>Meslek:</b> ${person.profession || 'Belirtilmemiş'}</p>
-                    <p><b>Doğum-Ölüm:</b> ${person.birthDeath || 'Belirtilmemiş'}</p>
-                `;
+            // Başlık, kapak ve profil resmi
+            document.title = `${person.name} ${person.surname} Profili`;
+            document.getElementById('cover').style.backgroundImage = `url('${
+                person.coverImage || 'images/default.jpg'}')`;
+            document.getElementById('profile-img').src = person.profileImage || 'images/default.jpg';
 
-                // Harita başlat
-                const coords = getCoordinates(person.locationLink);
-                console.log('Ana koordinatlar:', coords); // Hata ayıklama için
-                const map = L.map('profile-map').setView(coords, 12);
-                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                    maxZoom: 19,
-                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                }).addTo(map);
-                setTimeout(() => map.invalidateSize(), 100);
+            // Detayları göster
+            document.getElementById('details').innerHTML = `
+                <h2>${person.name} ${person.surname}</h2>
+                <p><b>Ünvan:</b> ${person.title || 'Belirtilmemiş'}</p>
+                <p><b>Meslek:</b> ${person.profession || 'Belirtilmemiş'}</p>
+                <p><b>Doğum-Ölüm:</b> ${person.birthDeath || 'Belirtilmemiş'}</p>
+            `;
 
-                // Kendi marker'ı
-                const personMarkerHtml = `<div class="custom-marker"><img src="${person.profileImage || 'images/default.jpg'}" alt="${person.name}"></div>`;
-                const personIcon = L.divIcon({
-                    html: personMarkerHtml,
-                    iconSize: [70, 153],
-                    iconAnchor: [35, 100]
-                });
-                const personMarker = L.marker(coords, { icon: personIcon }).addTo(map)
-                    .bindTooltip(`Mezar Konumu: ${person.name}`, { direction: 'top', sticky: true });
+            // Harita başlat
+            const coords = getCoordinates(person.locationLink);
+            console.log('Ana koordinatlar:', coords); // Hata ayıklama için
+            const map = L.map('profile-map').setView(coords, 12);
+            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            }).addTo(map);
+            setTimeout(() => map.invalidateSize(), 100);
 
-                // Aile ilişkilerini haritaya ekle
-                const familyRelations = JSON.parse(localStorage.getItem('familyRelations') || '{}');
-                const family = familyRelations[person.id] || {};
-                console.log('Aile ilişkileri:', family); // Hata ayıklama için
-                persons.forEach(familyPerson => {
-                    if (family[familyPerson.id]) {
-                        const familyCoords = getCoordinates(familyPerson.locationLink);
-                        console.log(`Aile üyesi koordinatları (${familyPerson.name}):`, familyCoords);
-                        const familyMarkerHtml = `<div class="custom-marker"><img src="${familyPerson.profileImage || 'images/default.jpg'}" alt="${familyPerson.name}"></div>`;
-                        const familyIcon = L.divIcon({
-                            html: familyMarkerHtml,
-                            iconSize: [70, 153],
-                            iconAnchor: [35, 100]
-                        });
-                        const relation = family[familyPerson.id].charAt(0).toUpperCase() + family[familyPerson.id].slice(1);
-                        const familyMarker = L.marker(familyCoords, { icon: familyIcon }).addTo(map)
-                            .bindTooltip(`${relation}: ${familyPerson.name}`, { direction: 'top', sticky: true });
-                        L.polyline([coords, familyCoords], { color: 'red' }).addTo(map);
-                        familyMarker.on('click', () => {
-                            window.location.href = `profile.html?ad=${familyPerson.urlSlug || encodeURIComponent(`${familyPerson.name.toLowerCase()}+${familyPerson.surname.toLowerCase()}`)}`;
-                        });
-                    }
-                });
+            // Kendi marker'ı
+            const personMarkerHtml = `<div class="custom-marker"><img src="${
+                person.profileImage || 'images/default.jpg'}" alt="${person.name}"></div>`;
+            const personIcon = L.divIcon({
+                html: personMarkerHtml,
+                iconSize: [70, 153],
+                iconAnchor: [35, 100]
+            });
+            const personMarker = L.marker(coords, { icon: personIcon }).addTo(map)
+                .bindTooltip(`Mezar Konumu: ${person.name}`, { direction: 'top', sticky: true });
 
-                // Ek lokasyonları haritaya ekle
-                const additionalLocations = person.additionalLocations || {};
-                console.log('Ek lokasyonlar:', additionalLocations); // Hata ayıklama için
-                Object.entries(additionalLocations).forEach(([locationName, locationData]) => {
-                    if (!Array.isArray(locationData) || locationData.length < 4) {
-                        console.warn(`Geçersiz ek lokasyon verisi: ${locationName}`, locationData);
-                        return;
-                    }
-                    const [locationLink, yapimYili, detay, resimler] = locationData;
-                    const additionalCoords = getCoordinates(locationLink);
-                    console.log(`Ek lokasyon koordinatları (${locationName}):`, additionalCoords);
-                    const additionalMarkerHtml = `<div class="custom-marker additional-marker"><span>${locationName}</span></div>`;
-                    const additionalIcon = L.divIcon({
-                        html: additionalMarkerHtml,
+            // Aile ilişkilerini haritaya ekle
+            const familyRelations = JSON.parse(localStorage.getItem('familyRelations') || '{}');
+            const family = familyRelations[person.id] || {};
+            console.log('Aile ilişkileri:', family); // Hata ayıklama için
+            persons.forEach(familyPerson => {
+                if (family[familyPerson.id]) {
+                    const familyCoords = getCoordinates(familyPerson.locationLink);
+                    console.log(`Aile üyesi koordinatları (${familyPerson.name}):`, familyCoords);
+                    const familyMarkerHtml = `<div class="custom-marker"><img src="${
+                        familyPerson.profileImage || 'images/default.jpg'}" alt="${
+                        familyPerson.name}"></div>`;
+                    const familyIcon = L.divIcon({
+                        html: familyMarkerHtml,
                         iconSize: [70, 153],
                         iconAnchor: [35, 100]
                     });
-                    const additionalMarker = L.marker(additionalCoords, { icon: additionalIcon }).addTo(map)
-                        .bindTooltip(locationName, { direction: 'top', sticky: true });
-                    L.polyline([coords, additionalCoords], { color: 'blue' }).addTo(map);
-                    additionalMarker.on('click', () => {
-                        document.getElementById('details').style.display = 'none';
-                        let locationHtml = `
-                            <h2>${locationName}</h2>
-                            <div class="gallery">
-                        `;
-                        (resimler || []).forEach(resim => {
-                            locationHtml += `<img src="${resim}" alt="${locationName}" style="max-width: 300px; margin: 10px;">`;
+                    const relation = family[familyPerson.id].charAt(0).toUpperCase() +
+                        family[familyPerson.id].slice(1);
+                    const familyMarker = L.marker(familyCoords, { icon: familyIcon }).addTo(map)
+                        .bindTooltip(`${relation}: ${familyPerson.name}`, {
+                            direction: 'top',
+                            sticky: true
                         });
-                        locationHtml += `
-                            </div>
-                            <p><b>Yapım Yılı:</b> ${yapimYili || 'Belirtilmemiş'}</p>
-                            <p><b>Detay:</b> ${detay || 'Belirtilmemiş'}</p>
-                        `;
-                        document.getElementById('location-details').innerHTML = locationHtml;
-                        document.getElementById('location-details').style.display = 'block';
+                    L.polyline([coords, familyCoords], { color: 'red' }).addTo(map);
+                    familyMarker.on('click', () => {
+                        window.location.href = `profile.html?ad=${
+                            familyPerson.urlSlug ||
+                            createUrlSlug(familyPerson.name, familyPerson.surname)}`;
                     });
-                });
-
-                // Kişi marker'ına tıklama ile geri dönme
-                personMarker.on('click', () => {
-                    document.getElementById('location-details').style.display = 'none';
-                    document.getElementById('details').style.display = 'block';
-                });
-            })
-            .catch(error => {
-                console.error('JSON yüklenirken hata:', error);
-                document.getElementById('details').innerHTML = '<p>Veri yüklenirken hata oluştu.</p>';
-                document.title = 'Hata';
+                }
             });
+
+            // Ek lokasyonları haritaya ekle
+            const additionalLocations = person.additionalLocations || {};
+            console.log('Ek lokasyonlar:', additionalLocations); // Hata ayıklama için
+            Object.entries(additionalLocations).forEach(([locationName, locationData]) => {
+                if (!Array.isArray(locationData) || locationData.length < 4) {
+                    console.warn(`Geçersiz ek lokasyon verisi: ${locationName}`, locationData);
+                    return;
+                }
+                const [locationLink, yapimYili, detay, resimler] = locationData;
+                const additionalCoords = getCoordinates(locationLink);
+                console.log(`Ek lokasyon koordinatları (${locationName}):`, additionalCoords);
+                const additionalMarkerHtml = `<div class="custom-marker additional-marker"><span>${
+                    locationName}</span></div>`;
+                const additionalIcon = L.divIcon({
+                    html: additionalMarkerHtml,
+                    iconSize: [70, 153],
+                    iconAnchor: [35, 100]
+                });
+                const additionalMarker = L.marker(additionalCoords, { icon: additionalIcon }).addTo(map)
+                    .bindTooltip(locationName, { direction: 'top', sticky: true });
+                L.polyline([coords, additionalCoords], { color: 'blue' }).addTo(map);
+                additionalMarker.on('click', () => {
+                    document.getElementById('details').style.display = 'none';
+                    let locationHtml = `
+                        <h2>${locationName}</h2>
+                        <div class="gallery">
+                    `;
+                    (resimler || []).forEach(resim => {
+                        locationHtml += `<img src="${resim}" alt="${locationName}" style="max-width: 300px; margin: 10px;">`;
+                    });
+                    locationHtml += `
+                        </div>
+                        <p><b>Yapım Yılı:</b> ${yapimYili || 'Belirtilmemiş'}</p>
+                        <p><b>Detay:</b> ${detay || 'Belirtilmemiş'}</p>
+                    `;
+                    document.getElementById('location-details').innerHTML = locationHtml;
+                    document.getElementById('location-details').style.display = 'block';
+                });
+            });
+
+            // Kişi marker'ına tıklama ile geri dönme
+            personMarker.on('click', () => {
+                document.getElementById('location-details').style.display = 'none';
+                document.getElementById('details').style.display = 'block';
+            });
+        })
+        .catch(error => {
+            console.error('JSON yüklenirken hata:', error);
+            document.getElementById('details').innerHTML = '<p>Veri yüklenirken hata oluştu.</p>';
+            document.title = 'Hata';
+        });
     </script>
 </body>
 </html>
+
