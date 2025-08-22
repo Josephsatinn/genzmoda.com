@@ -14,7 +14,9 @@
 </style>
 </head>
 <body>
-<h2>ETBİS Şirket Listesi <button class="button" onclick="exportCSV()">Excel Olarak İndir</button></h2>
+<h2>
+    asdasdsad
+    ETBİS Şirket Listesi <button class="button" onclick="exportCSV()">Excel Olarak İndir</button></h2>
 <p><strong id="totalRows">Toplam Satır Sayısı: 0</strong></p>
 
 <table id="dataTable">
@@ -44,7 +46,7 @@ data.forEach(row => {
     const tr = document.createElement("tr");
     row.forEach((cell, i) => {
         const td = document.createElement("td");
-        if(i === 3){ // Profil linki
+        if(i === 10){ // Profil linki
             td.innerHTML = `<a href="${cell}" target="_blank">Profili Gör</a>`;
         } else {
             td.textContent = cell;
