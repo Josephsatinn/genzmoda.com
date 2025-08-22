@@ -220,7 +220,7 @@
             maxZoom: 19,
             attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
         }).addTo(miniMap);
-        setTimeout(() => miniMap.invalidateSize(), 100); // Harita boyutunu güncelle
+        setTimeout(() => miniMap.invalidateSize(), 100);
 
         let marker = null;
         miniMap.on('click', (e) => {
@@ -259,7 +259,7 @@
             additionalMarkers[0] = L.marker(e.latlng).addTo(initialMap)
                 .bindTooltip(`Seçilen: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`, { direction: 'top', sticky: true });
         });
-        setTimeout(() => initialMap.invalidateSize(), 100); // İlk harita için boyut güncelleme
+        setTimeout(() => initialMap.invalidateSize(), 100);
 
         function addLocation() {
             locationCount++;
@@ -296,7 +296,6 @@
             document.getElementById('additional-locations').appendChild(locationDiv);
             document.getElementById('location_count').value = locationCount;
 
-            // Yeni mini harita oluştur
             const additionalMap = L.map(`mini-map-location-${locationCount}`).setView([41.0082, 28.9784], 12);
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 19,
@@ -305,14 +304,12 @@
             additionalMaps[locationCount] = additionalMap;
             additionalMarkers[locationCount] = null;
 
-            // Yeni harita için tıklama eventi
             additionalMap.on('click', (e) => {
                 if (additionalMarkers[locationCount]) additionalMap.removeLayer(additionalMarkers[locationCount]);
                 additionalMarkers[locationCount] = L.marker(e.latlng).addTo(additionalMap)
                     .bindTooltip(`Seçilen: ${e.latlng.lat.toFixed(6)}, ${e.latlng.lng.toFixed(6)}`, { direction: 'top', sticky: true });
             });
 
-            // Harita boyutunu güncelle
             setTimeout(() => additionalMap.invalidateSize(), 100);
         }
 
@@ -338,11 +335,10 @@
             } else {
                 alert('Lütfen haritadan bir konum seçin!');
             }
-            // Harita boyutunu tekrar güncelle
             setTimeout(() => additionalMap.invalidateSize(), 100);
         }
 
-        // Aile fertleri arama (ad, soyad ve ünvan ile)
+        // Aile fertleri arama
         fetch('persons.json')
             .then(response => {
                 if (!response.ok) throw new Error('persons.json bulunamadı');
@@ -351,7 +347,7 @@
             .then(staticPersons => {
                 const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
                 const persons = [...staticPersons, ...dynamicPersons];
-                console.log('Yüklenen kişiler:', persons); // Hata ayıklama için
+                console.log('Yüklenen kişiler:', persons);
 
                 const familySearch = document.getElementById('family-search');
                 const familyResults = document.getElementById('family-results');
@@ -368,7 +364,7 @@
                         if (matches.length > 0) {
                             matches.forEach(person => {
                                 const div = document.createElement('div');
-                                div.innerHTML = `<img src="${person.profileImage || 'images/default.jpg'}" alt="${person.name}" style="width: 30px; height: 30px; border-radius: 50%;"> <span>${person.name} ${person.surname} (${person.title})</span>`;
+                                div.innerHTML = `<img src="${person.profileImage || 'images/default.jpg'}" alt="${person.name}" style="width: 30px; height: 30px; border-radius: 50%;"> <span data-id="${person.id}">${person.name} ${person.surname} (${person.title})</span>`;
                                 div.addEventListener('click', function() {
                                     const selectedFamily = document.getElementById('selected-family');
                                     const existing = selectedFamily.querySelectorAll('span');
@@ -379,7 +375,7 @@
                                     if (!exists) {
                                         const familyItem = document.createElement('div');
                                         familyItem.className = 'family-item';
-                                        familyItem.innerHTML = `<img src="${person.profileImage || 'images/default.jpg'}" alt="Profil"> <span>${person.name} ${person.surname} (${person.title})</span> <span class="remove-family" onclick="this.parentElement.remove(); updateFamilyInput()">x</span>`;
+                                        familyItem.innerHTML = `<img src="${person.profileImage || 'images/default.jpg'}" alt="Profil"> <span data-id="${person.id}">${person.name} ${person.surname} (${person.title})</span> <span class="remove-family" onclick="this.parentElement.remove(); updateFamilyInput()">x</span>`;
                                         selectedFamily.appendChild(familyItem);
                                         updateFamilyInput();
                                     }
@@ -398,8 +394,11 @@
 
         function updateFamilyInput() {
             const selected = document.querySelectorAll('#selected-family .family-item span');
-            const familyIds = Array.from(selected).map(span => span.textContent);
-            document.getElementById('family-input').value = JSON.stringify(familyIds);
+            const familyData = Array.from(selected).map(span => ({
+                id: span.getAttribute('data-id'),
+                text: span.textContent
+            }));
+            document.getElementById('family-input').value = JSON.stringify(familyData);
         }
 
         // Form gönderimi
@@ -421,7 +420,7 @@
             }
 
             const newPerson = {
-                id: Date.now(), // Geçici ID
+                id: Date.now(),
                 name: formData.get('name'),
                 surname: formData.get('surname'),
                 title: formData.get('title'),
@@ -438,6 +437,16 @@
             const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
             dynamicPersons.push(newPerson);
             localStorage.setItem('dynamicPersons', JSON.stringify(dynamicPersons));
+
+            // Aile ilişkilerini güncelle
+            const familyRelations = JSON.parse(localStorage.getItem('familyRelations') || '{}');
+            familyRelations[newPerson.id] = {};
+            newPerson.family.forEach(familyMember => {
+                familyRelations[newPerson.id][familyMember.id] = 'aile ferdi';
+                if (!familyRelations[familyMember.id]) familyRelations[familyMember.id] = {};
+                familyRelations[familyMember.id][newPerson.id] = 'aile ferdi';
+            });
+            localStorage.setItem('familyRelations', JSON.stringify(familyRelations));
 
             alert('Kişi başarıyla eklendi! index.html sayfasında görünecek. Kalıcı saklama için persons.json dosyasını güncelleyin veya bir backend kullanın:\n\n' + JSON.stringify(newPerson, null, 2));
             window.location.href = 'index.html';
