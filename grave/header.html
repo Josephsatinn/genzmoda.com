@@ -1,0 +1,102 @@
+```html
+<div id="header" class="custom-header">
+    <div class="header-home">Anasayfa</div>
+    <div class="search-container">
+        <input type="text" class="form-control header-search" placeholder="Kişi ara...">
+        <div id="search-results" class="search-results"></div>
+    </div>
+    <div class="header-profile">
+        <img src="/grave/images/ahmet.jpg" alt="Profil Resmi">
+    </div>
+</div>
+
+<style>
+    .custom-header {
+        position: fixed;
+        top: 0;
+        left: 2%;
+        width: calc(100% - 4%);
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        padding: 10px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-sizing: border-box;
+    }
+    .header-home {
+        font-size: 1.2rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .search-container {
+        position: relative;
+        flex-grow: 1;
+        max-width: 500px;
+        margin: 0 20px;
+    }
+    .header-search {
+        width: 100%;
+    }
+    .search-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: white;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        max-height: 300px;
+        overflow-y: auto;
+        z-index: 1001;
+        display: none;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    .search-results.show {
+        display: block;
+    }
+    .search-result-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .search-result-item:hover {
+        background-color: #f0f0f0;
+    }
+    .search-result-item img {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+    .header-profile img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 2px solid #ccc;
+    }
+    @media (max-width: 768px) {
+        .custom-header {
+            left: 1%;
+            width: calc(100% - 2%);
+            padding: 8px 15px;
+        }
+        .header-home {
+            font-size: 1rem;
+        }
+        .search-container {
+            margin: 0 10px;
+        }
+        .header-profile img {
+            width: 30px;
+            height: 30px;
+        }
+    }
+</style>
+```

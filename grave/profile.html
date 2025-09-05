@@ -100,6 +100,7 @@
     </style>
 </head>
 <body>
+    <div id="header-container"></div>
     <div class="container">
         <a href="index.html" class="btn btn-back mb-3">Geri Dön</a>
         <div id="cover" class="cover">
@@ -323,6 +324,18 @@
             console.error('JSON yüklenirken hata:', error);
             document.getElementById('details').innerHTML = '<p>Veri yüklenirken hata oluştu.</p>';
             document.title = 'Hata';
+        });
+        fetch('header.html')
+        .then(response => {
+            if (!response.ok) throw new Error('Header yüklenemedi: ' + response.status);
+            return response.text();
+        })
+        .then(data => {
+            document.getElementById('header-container').innerHTML = data;
+        })
+        .catch(error => {
+            console.error('Header yüklenirken hata:', error);
+            document.getElementById('header-container').innerHTML = '<p>Header yüklenemedi.</p>';
         });
     </script>
 </body>

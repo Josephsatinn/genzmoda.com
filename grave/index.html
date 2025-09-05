@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="tr">
 <head>
@@ -8,7 +10,7 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
     <style>
         *, body {
-            font-family: system-ui;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
         #map {
             height: 500px;
@@ -21,7 +23,7 @@
             position: relative;
             width: 70px;
             height: 100px;
-            background: url('pın.png') no-repeat center;
+            background: url('/grave/pin.png') no-repeat center;
             background-size: contain;
             transition: transform 0.3s;
         }
@@ -47,14 +49,21 @@
             height: 500px;
             overflow-y: auto;
             border-right: 1px solid #ccc;
+            display: block !important;
+            visibility: visible !important;
+            background-color: #fff;
+            z-index: 1;
         }
         .person-item {
-            display: flex;
+            display: flex !important;
             gap: 10px;
             cursor: pointer;
             transition: transform 0.3s;
-            padding: 0px 10px 0px 10px;
+            padding: 10px;
             border-radius: 5px;
+            margin-bottom: 10px;
+            background-color: #fff;
+            visibility: visible !important;
         }
         .person-item:hover {
             border: 1px solid #007bff;
@@ -95,15 +104,20 @@
         .delete-btn:hover {
             background-color: #cc0000;
         }
+        .container {
+            padding-top: 120px;
+        }
     </style>
 </head>
 <body>
+    <div id="header-container"></div>
+
     <div class="container">
         <div class="row">
             <div class="col-md-4 person-list">
                 <h4>Kişiler</h4>
                 <div id="person-list"></div>
-                <a href="add-person.html" class="add-person-btn">Kişi Ekle</a>
+                <a href="/grave/add-person.html" class="add-person-btn">Kişi Ekle</a>
             </div>
             <div class="col-md-8">
                 <h1>Harita Üzerinde Kişiler</h1>
@@ -120,149 +134,253 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script>
-// Türkçe karakterleri Latin harflerine çeviren ve adsoyad formatında urlSlug oluşturan fonksiyon
-    function createUrlSlug(name, surname) {
-        const turkishToLatin = str => str
-            .replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i')
-            .replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u')
-            .replace(/Ç/g, 'C').replace(/Ğ/g, 'G').replace(/İ/g, 'I')
-            .replace(/Ö/g, 'O').replace(/Ş/g, 'S').replace(/Ü/g, 'U');
-        return `${turkishToLatin(name.toLowerCase())}${turkishToLatin(surname.toLowerCase())}`;
-    }
+        // Türkçe karakterleri normalize etme
+        function normalizeString(str) {
+            return str
+                .toLowerCase()
+                .replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i')
+                .replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u')
+                .replace(/%2b/g, ' ').replace(/\+/g, ' ');
+        }
 
-    // JSON dosyasını ve localStorage'ı yükle
-    fetch('persons.json')
-        .then(response => {
-            if (!response.ok) throw new Error('persons.json bulunamadı: ' + response.status);
-            return response.json();
-        })
-        .then(staticPersons => {
-            // localStorage'dan dinamik kişileri al
-            const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
-            const persons = [...staticPersons, ...dynamicPersons].map(person => ({
-                ...person,
-                lat: person.locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/) ?
-                    parseFloat(person.locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/)[1]) :
-                    41.0082, // Varsayılan İstanbul
-                lng: person.locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/) ?
-                    parseFloat(person.locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/)[2]) :
-                    28.9784,
-                urlSlug: person.urlSlug || createUrlSlug(person.name, person.surname)
-            }));
-            console.log('Yüklenen kişiler:', persons.map(p => ({
-                id: p.id,
-                name: p.name,
-                surname: p.surname,
-                urlSlug: p.urlSlug
-            }))); // Hata ayıklama için
-
-            // Harita başlat
-            const map = L.map('map').setView([39, 35], 6);
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19,
-                attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-            }).addTo(map);
-
-            // Kişileri haritaya ekle
-            persons.forEach(person => {
-                const markerHtml = `<div class="custom-marker"><img src="${
-                    person.profileImage || 'images/default.jpg'}" alt="${person.name}"></div>`;
-                const customIcon = L.divIcon({
-                    html: markerHtml,
-                    iconSize: [50, 70],
-                    iconAnchor: [25, 70]
+        // Arama işlevselliği
+        function searchPersons(query, persons) {
+            console.log('Arama yapılıyor:', query);
+            const searchResults = document.getElementById('search-results');
+            if (!searchResults) {
+                console.error('Hata: search-results bulunamadı');
+                return;
+            }
+            searchResults.innerHTML = '';
+            if (!query) {
+                searchResults.classList.remove('show');
+                return;
+            }
+            const normalizedQuery = normalizeString(query);
+            const matches = persons.filter(person => 
+                normalizeString(`${person.name} ${person.surname}`).includes(normalizedQuery)
+            );
+            console.log('Eşleşen kişiler:', matches.length);
+            if (matches.length === 0) {
+                searchResults.innerHTML = '<div class="search-result-item">Sonuç bulunamadı</div>';
+            } else {
+                matches.forEach(person => {
+                    const div = document.createElement('div');
+                    div.className = 'search-result-item';
+                    div.innerHTML = `
+                        <img src="${person.profileImage}" alt="${person.name}">
+                        <div>
+                            <strong><a href="/grave/profile.html?${person.urlSlug}">${
+                                person.name} ${person.surname}</a></strong><br>
+                            <small>${person.title || 'Bilinmiyor'} (${person.profession || 'Bilinmiyor'})</small>
+                        </div>
+                    `;
+                    div.addEventListener('click', () => {
+                        window.location.href = `/grave/profile.html?${person.urlSlug}`;
+                    });
+                    searchResults.appendChild(div);
                 });
+            }
+            searchResults.classList.add('show');
+            console.log('search-results gösteriliyor, öğe sayısı:', searchResults.children.length);
+        }
 
-                const marker = L.marker([person.lat, person.lng], {
-                    icon: customIcon
+        // Türkçe karakterleri Latin harflerine çeviren ve urlSlug oluşturan fonksiyon
+        function createUrlSlug(name, surname) {
+            const turkishToLatin = str => str
+                .replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i')
+                .replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u')
+                .replace(/Ç/g, 'C').replace(/Ğ/g, 'G').replace(/İ/g, 'I')
+                .replace(/Ö/g, 'O').replace(/Ş/g, 'S').replace(/Ü/g, 'U');
+            return `${turkishToLatin(name.toLowerCase())}${turkishToLatin(surname.toLowerCase())}`;
+        }
+
+        // Header'ı yükle ve kişi listesini oluştur
+        async function loadDataAndHeader() {
+            try {
+                // Header'ı yükle
+                const headerResponse = await fetch('/grave/header.html');
+                if (!headerResponse.ok) throw new Error('Header yüklenemedi: ' + headerResponse.status);
+                const headerData = await headerResponse.text();
+                document.getElementById('header-container').innerHTML = headerData;
+                console.log('Header yüklendi');
+
+                // Header olaylarını bağla
+                const searchInput = document.querySelector('.header-search');
+                let persons = []; // Arama için kişiler global olarak erişilebilir
+                if (searchInput) {
+                    console.log('Arama kutusu bulundu');
+                    searchInput.addEventListener('input', (e) => {
+                        console.log('Arama input olayı tetiklendi:', e.target.value);
+                        searchPersons(e.target.value, persons);
+                    });
+                    searchInput.addEventListener('blur', () => {
+                        setTimeout(() => {
+                            const searchResults = document.getElementById('search-results');
+                            if (searchResults) searchResults.classList.remove('show');
+                        }, 200);
+                    });
+                } else {
+                    console.error('Hata: .header-search bulunam不了');
+                }
+
+                const homeLink = document.querySelector('.header-home');
+                if (homeLink) {
+                    homeLink.addEventListener('click', () => {
+                        window.location.href = '/grave/index.html';
+                    });
+                }
+
+                const profileImg = document.querySelector('.header-profile img');
+                if (profileImg) {
+                    profileImg.addEventListener('click', () => {
+                        console.log('Profil resmine tıklandı');
+                    });
+                }
+
+                // JSON dosyasını ve localStorage'ı yükle
+                const response = await fetch('/grave/persons.json');
+                if (!response.ok) throw new Error('persons.json bulunamadı: ' + response.status);
+                const staticPersons = await response.json();
+
+                const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
+                persons = [...staticPersons, ...dynamicPersons].map(person => ({
+                    ...person,
+                    lat: person.locationLink && person.locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/) ?
+                        parseFloat(person.locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/)[1]) :
+                        41.0082,
+                    lng: person.locationLink && person.locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/) ?
+                        parseFloat(person.locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/)[2]) :
+                        28.9784,
+                    urlSlug: person.urlSlug || createUrlSlug(person.name, person.surname),
+                    profileImage: person.profileImage || 'https://via.placeholder.com/30'
+                }));
+                console.log('Yüklenen kişiler:', persons.map(p => ({
+                    id: p.id,
+                    name: p.name,
+                    surname: p.surname,
+                    urlSlug: p.urlSlug
+                })));
+
+                // Harita başlat
+                const map = L.map('map').setView([39, 35], 6);
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 }).addTo(map);
 
-                marker.bindTooltip(`
-                    <b>${person.name} ${person.surname}</b><br>
-                    ${person.title} - ${person.profession}<br>
-                    ${person.birthDeath}
-                `, {
-                    direction: 'top',
-                    sticky: true
-                });
-
-                marker.on('click', () => {
-                    map.flyTo([person.lat, person.lng], 18, {
-                        animate: true,
-                        duration: 2
+                // Kişileri haritaya ekle
+                persons.forEach(person => {
+                    const markerHtml = `<div class="custom-marker"><img src="${
+                        person.profileImage}" alt="${person.name}"></div>`;
+                    const customIcon = L.divIcon({
+                        html: markerHtml,
+                        iconSize: [50, 70],
+                        iconAnchor: [25, 70]
                     });
-                    document.getElementById('details').innerHTML = `
-                        <h2>${person.name} ${person.surname}<a href="profile.html?${
-                            person.urlSlug}" class="btn btn-primary">Profile Git</a></h2>
-                        <img src="${person.profileImage || 'images/default.jpg'}" alt="Profil" style="width:200px;">
-                        <p><b>Ünvan:</b> ${person.title}</p>
-                        <p><b>Meslek:</b> ${person.profession}</p>
-                        <p><b>Doğum-Ölüm:</b> ${person.birthDeath}</p>
-                    `;
-                });
-            });
 
-            // Kişi listesini oluştur
-            const personList = document.getElementById('person-list');
-            persons.forEach(person => {
-                const div = document.createElement('div');
-                div.className = 'person-item';
-                div.setAttribute('data-id', person.id);
-                div.innerHTML = `
-                    <img src="${person.profileImage || 'images/default.jpg'}" class="person-image" alt="${
-                        person.name}">
-                    <div>
-                        <strong><a href="profile.html?${person.urlSlug}">${
-                            person.name} ${person.surname}</a></strong><br>
-                        <small>${person.title} (${person.profession}) ${person.birthDeath}</small>
-                    </div>
-                    <button class="delete-btn" onclick="deletePerson(${person.id})">Sil</button>
-                `;
-                div.addEventListener('click', () => {
-                    map.flyTo([person.lat, person.lng], 18, {
-                        animate: true,
-                        duration: 2
+                    const marker = L.marker([person.lat, person.lng], {
+                        icon: customIcon
+                    }).addTo(map);
+
+                    marker.bindTooltip(`
+                        <b>${person.name} ${person.surname}</b><br>
+                        ${person.title || 'Bilinmiyor'} - ${person.profession || 'Bilinmiyor'}<br>
+                        ${person.birthDeath || 'Bilinmiyor'}
+                    `, {
+                        direction: 'top',
+                        sticky: true
                     });
-                    document.getElementById('details').innerHTML = `
-                        <h2>${person.name} ${person.surname}<a href="profile.html?${
-                            person.urlSlug}" class="btn btn-primary">Profile Git</a></h2>
-                        <img src="${person.profileImage || 'images/default.jpg'}" alt="Profil" style="width:200px;">
-                        <p><b>Ünvan:</b> ${person.title}</p>
-                        <p><b>Meslek:</b> ${person.profession}</p>
-                        <p><b>Doğum-Ölüm:</b> ${person.birthDeath}</p>
-                    `;
+
+                    marker.on('click', () => {
+                        map.flyTo([person.lat, person.lng], 18, {
+                            animate: true,
+                            duration: 2
+                        });
+                        document.getElementById('details').innerHTML = `
+                            <h2>${person.name} ${person.surname}<a href="/grave/profile.html?${
+                                person.urlSlug}" class="btn btn-primary">Profile Git</a></h2>
+                            <img src="${person.profileImage}" alt="Profil" style="width:200px;">
+                            <p><b>Ünvan:</b> ${person.title || 'Bilinmiyor'}</p>
+                            <p><b>Meslek:</b> ${person.profession || 'Bilinmiyor'}</p>
+                            <p><b>Doğum-Ölüm:</b> ${person.birthDeath || 'Bilinmiyor'}</p>
+                        `;
+                    });
                 });
-                personList.appendChild(div);
-            });
-        })
-        .catch(error => {
-            console.error('JSON yüklenirken hata:', error);
-            document.getElementById('person-list').innerHTML = '<p>Kişiler yüklenirken hata oluştu.</p>';
-        });
 
-    // Dinamik kişiyi silme
-    function deletePerson(id) {
-        const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
-        const updatedPersons = dynamicPersons.filter(person => person.id !== id);
-        localStorage.setItem('dynamicPersons', JSON.stringify(updatedPersons));
+                // Kişi listesini oluştur
+                const personList = document.getElementById('person-list');
+                if (!personList) {
+                    console.error('Hata: #person-list div bulunamadı');
+                    return;
+                }
+                personList.innerHTML = '';
+                console.log('Kişi listesi oluşturuluyor, kişi sayısı:', persons.length);
+                persons.forEach(person => {
+                    const div = document.createElement('div');
+                    div.className = 'person-item';
+                    div.setAttribute('data-id', person.id);
+                    div.innerHTML = `
+                        <img src="${person.profileImage}" class="person-image" alt="${person.name}">
+                        <div>
+                            <strong><a href="/grave/profile.html?${person.urlSlug}">${
+                                person.name} ${person.surname}</a></strong><br>
+                            <small>${person.title || 'Bilinmiyor'} (${person.profession || 'Bilinmiyor'}) ${
+                                person.birthDeath || 'Bilinmiyor'}</small>
+                        </div>
+                        <button class="delete-btn" onclick="deletePerson(${person.id})">Sil</button>
+                    `;
+                    div.addEventListener('click', () => {
+                        map.flyTo([person.lat, person.lng], 18, {
+                            animate: true,
+                            duration: 2
+                        });
+                        document.getElementById('details').innerHTML = `
+                            <h2>${person.name} ${person.surname}<a href="/grave/profile.html?${
+                                person.urlSlug}" class="btn btn-primary">Profile Git</a></h2>
+                            <img src="${person.profileImage}" alt="Profil" style="width:200px;">
+                            <p><b>Ünvan:</b> ${person.title || 'Bilinmiyor'}</p>
+                            <p><b>Meslek:</b> ${person.profession || 'Bilinmiyor'}</p>
+                            <p><b>Doğum-Ölüm:</b> ${person.birthDeath || 'Bilinmiyor'}</p>
+                        `;
+                    });
+                    personList.appendChild(div);
+                });
+                console.log('Kişi listesi oluşturuldu, DOM\'da kişi sayısı:', personList.querySelectorAll('.person-item').length);
 
-        // Aile ilişkilerinden de sil
-        const familyRelations = JSON.parse(localStorage.getItem('familyRelations') || '{}');
-        delete familyRelations[id];
-        Object.keys(familyRelations).forEach(key => {
-            if (familyRelations[key][id]) {
-                delete familyRelations[key][id];
+                // Arama kutusunun mevcut değerini kontrol et
+                if (searchInput && searchInput.value) {
+                    console.log('Mevcut arama değeri:', searchInput.value);
+                    searchPersons(searchInput.value, persons);
+                }
+            } catch (error) {
+                console.error('Veri veya header yüklenirken hata:', error);
+                document.getElementById('person-list').innerHTML = '<p>Kişiler yüklenirken hata oluştu.</p>';
             }
-        });
-        localStorage.setItem('familyRelations', JSON.stringify(familyRelations));
+        }
 
-        alert(`Kişi (ID: ${id}) silindi. Sayfayı yenileyin.`);
-        window.location.reload();
-    }
+        // Dinamik kişiyi silme
+        function deletePerson(id) {
+            const dynamicPersons = JSON.parse(localStorage.getItem('dynamicPersons') || '[]');
+            const updatedPersons = dynamicPersons.filter(person => person.id !== id);
+            localStorage.setItem('dynamicPersons', JSON.stringify(updatedPersons));
+
+            const familyRelations = JSON.parse(localStorage.getItem('familyRelations') || '{}');
+            delete familyRelations[id];
+            Object.keys(familyRelations).forEach(key => {
+                if (familyRelations[key][id]) {
+                    delete familyRelations[key][id];
+                }
+            });
+            localStorage.setItem('familyRelations', JSON.stringify(familyRelations));
+
+            alert(`Kişi (ID: ${id}) silindi. Sayfayı yenileyin.`);
+            window.location.reload();
+        }
+
+        // Sayfayı yüklerken verileri ve header'ı yükle
+        loadDataAndHeader();
     </script>
 </body>
 </html>
-
-
-
-
+```
