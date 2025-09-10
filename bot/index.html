@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Bot ile çekilen ETBİS Şirket Listesi</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+        th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        th { background: #f2f2f2; }
+        tr:nth-child(even) { background: #fafafa; }
+        .button { display: inline-block; background: #f44336; color: #fff; padding: 10px 15px; text-decoration: none; border-radius: 4px; cursor: pointer; }
+        .button:hover { opacity: 0.8; }
+        #error { color: red; }
+    </style>
+</head>
+<body>
+    <h2>Bot ile çekilen ETBİS Şirket Listesi <button class="button" onclick="exportCSV()">Excel Olarak İndir</button> </h2>
+    <br>
+    <a>Eğer veriler gelmiyorsa ! Verileri çekmek için <a href="https://cors-anywhere.herokuapp.com/">https://cors-anywhere.herokuapp.com/</a> adresine tıkla ve açılan sayfada "Request temporary access to the demo server" butonuna tıkla.</a>
+    <p><strong id="totalRows">Toplam Satır Sayısı: 0</strong></p>
+    <p id="error"></p>
+    <table id="dataTable">
+        <thead>
+            <tr>
+                <th>İşletme Unvanı</th>
+                <th>E-Ticaret Sitesi</th>
+                <th>Mobil Uygulama</th>
+                <th>Profil Linki</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        const baseUrl = "https://etbis.ticaret.gov.tr/tr/Home/SearchSite?page=%d&url=&cityId=3ff1b991-8524-4e69-a5da-226fbfc7cda4&districtId=f462ede6-52c4-471b-8970-4d9e0eab01d5&sector=&isItCrossBorder=";
+        const proxyUrl = "https://cors-anywhere.herokuapp.com/"; // Test amaçlı CORS proxy
+        const data = [];
+
+        // Verileri çekme fonksiyonu
+        async function fetchData() {
+            const tbody = document.querySelector("#dataTable tbody");
+            const totalRows = document.getElementById("totalRows");
+            const errorEl = document.getElementById("error");
+
+            try {
+                for (let page = 1; page <= 3; page++) {
+                    const url = proxyUrl + sprintf(baseUrl, page);
+                    const response = await fetch(url, {
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                        }
+                    });
+                    if (!response.ok) {
+                        throw new Error(`Sayfa ${page} çekilemedi: ${response.status}`);
+                    }
+                    const html = await response.text();
+
+                    // HTML'i ayrıştır
+                    const parser = new DOMParser();
+                    const dom = parser.parseFromString(html, 'text/html');
+                    const rows = dom.querySelectorAll("table tbody tr");
+
+                    rows.forEach(row => {
+                        const cols = row.querySelectorAll("td");
+                        if (cols.length < 4) return;
+                        const firma = cols[0].textContent.trim();
+                        const site = cols[1].textContent.trim();
+                        const mobil = cols[2].textContent.trim();
+                        const profilLinkEl = cols[3].querySelector("a");
+                        const profilLink = profilLinkEl ? "https://etbis.ticaret.gov.tr" + profilLinkEl.getAttribute("href") : "";
+                        data.push([firma, site, mobil, profilLink]);
+
+                        // Tabloya ekle
+                        const tr = document.createElement("tr");
+                        [firma, site, mobil, profilLink].forEach((cell, i) => {
+                            const td = document.createElement("td");
+                            if (i === 3 && cell) {
+                                td.innerHTML = `<a href="${cell}" target="_blank">Profili Gör</a>`;
+                            } else {
+                                td.textContent = cell;
+                            }
+                            tr.appendChild(td);
+                        });
+                        tbody.appendChild(tr);
+                    });
+                }
+                totalRows.textContent = `Toplam Satır Sayısı: ${data.length}`;
+            } catch (error) {
+                errorEl.textContent = `Hata: ${error.message}`;
+                console.error(error);
+            }
+        }
+
+        // sprintf yerine basit bir yer değiştirme fonksiyonu
+        function sprintf(str, page) {
+            return str.replace("%d", page);
+        }
+
+        // CSV indirme fonksiyonu
+        function exportCSV() {
+            let csvContent = "\uFEFF"; // UTF-8 BOM
+            csvContent += "İşletme Unvanı;E-Ticaret Sitesi;Mobil Uygulama;Profil Linki\n";
+            data.forEach(row => {
+                csvContent += row.map(cell => `"${cell.replace(/"/g, '""')}"`).join(";") + "\n";
+            });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "etbis_sirketler.csv");
+            link.click();
+        }
+
+        // Sayfaya yüklendiğinde verileri çek
+        fetchData();
+    </script>
+</body>
+</html>

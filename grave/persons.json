@@ -1,0 +1,24 @@
+[
+    {
+        "id": 1,
+        "name": "Ahmet",
+        "surname": "Yılmaz",
+        "title": "Prof. Dr.",
+        "profession": "Doktor",
+        "birthDeath": "1970-",
+        "locationLink": "https://www.google.com/maps?q=41.0082,28.9784",
+        "profileImage": "images/ahmet.jpg",
+        "coverImage": "images/kapakresim.webp"  
+    },
+    {
+        "id": 2,
+        "name": "Fatih Sultan",
+        "surname": "Mehmet",
+        "title": "Padişah",
+        "profession": "İstanbul'un Fatiihi",
+        "birthDeath": "1432-1481",
+        "locationLink": "https://maps.google.com/?q=41.016793682313924,28.94845962524414",
+        "profileImage": "images/mehmet.png",
+        "coverImage": "images/topkapi-sarayi.webp"  
+    }
+]
