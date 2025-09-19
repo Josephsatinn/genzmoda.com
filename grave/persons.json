@@ -1,0 +1,81 @@
+[
+    {
+        "id": 1,
+        "name": "Osman",
+        "surname": "Gazi",
+        "title": "Osmanlı'nın Kurucusu",
+        "profession": "Padişah",
+        "birthDeath": "1258-1326",
+        "locationLink": "https://maps.google.com/?q=40.186668,29.057476",
+        "profileImage": "images/osman.png",
+        "coverImage": "images/osmangazi.png",
+        "about": "I. Osman veya bilinen adlarıyla Osman Gazi ya da Osman Bey (Osmanlıca: عثمان بك, y. 1254–58, Söğüt – 1324, Bursa), Osmanlı Beyliği ve Osmanlı Hanedanı'nın kurucusu ve beyliğin ilk padişahı olan Türk hükümdar ve komutandır. Yaşadığı dönemde liderliğini yaptığı beylik başlangıçta küçük bir Türk beyliği iken, ölümünden sonraki yüzyıllarda büyük bir imparatorluğa dönüştü. Dedesinin Süleyman Şah veya Gündüz Alp isimli olduğu ve soyunun Oğuzların Bozok koluna mensup Kayı boyuna dayandığı düşünülmektedir.Büyükannesi Hayme Hatun, babası Ertuğrul Gazi ve annesi Halime Hatun'dur. Tarihçi Âşıkpaşazâde'nin yazdığına göre Osman Gazi, bir taraftan kendisinin Oğuzların Üçok koluna mensup Gök Alp neslinden olduğunu ileri sürerken diğer taraftan da kendi dedesinin isminin Kaya Alp oğlu Süleyman Şah değil, Kutalmışoğlu Süleyman Şah olduğunu söylediği iddia edilmektedir.",
+        "additionalLocations": {
+            "Söğüt": [
+                "https://maps.google.com/?q=40.4863,30.0956",
+                "1258",
+                "Osman Gazi'nin doğduğu yer",
+                ["images/sogut1.jpg", "images/sogut2.jpg"]
+            ],
+            "Kılıç": [
+                "https://maps.google.com/?q=40.1828,29.0663",
+                "1326",
+                "Osman Gazi'nin kılıcının bulunduğu yer",
+                ["images/bursa1.jpg", "images/bursa2.jpg", "images/bursa3.webp"]
+            ]
+        }
+    },
+    {
+        "id": 2,
+        "name": "Yavuz Sultan",
+        "surname": "Selim",
+        "title": "Selîmî",
+        "profession": "Padişah",
+        "birthDeath": "1470-1520",
+        "locationLink": "https://www.google.com/maps?q=41.0263357,28.9515384,21",
+        "profileImage": "images/ahmet.jpg",
+        "coverImage": "images/kapakresim.webp",
+        "about": "Yavuz Sultan Selim (Osmanlıca: سليم ثان, Selim-i Sânî; 10 Ekim 1470, Amasya – 22 Eylül 1520, Çorlu), Osmanlı padişahı (1512-1520). Babası II. Bayezid, annesi Gülbahar Hatun'dur. Kardeşleri arasında en büyük olanıdır. Tahta çıkmadan önceki adı Selim'dir. Hükümdarlığı sırasında Safevîler ve Memlûkler ile yaptığı savaşlarla Osmanlı topraklarını önemli ölçüde genişletmiş, İslam dünyasının liderliğini de Osmanlılara kazandırmıştır. Bu nedenle kendisine Yavuz (sert, haşin) lakabı verilmiştir.",
+        "additionalLocations": {
+            "Amasya": [
+                "https://maps.google.com/?q=40.6520,35.8353",
+                "1470",
+                "Yavuz Sultan Selim'in doğduğu yer",
+                ["images/amasya1.jpg"]
+            ],
+            "Kılıç": [
+                "https://maps.google.com/?q=41.016793682313924,28.94845962524414",
+                "1520",
+                "Yavuz Sultan Selim'in kılıcının bulunduğu yer",
+                ["images/kilic1.jpeg", "images/topkapiyss.webp", "images/kilic2.jpg"]
+            ]
+        }
+    },
+    {
+        "id": 3,
+        "name": "Fatih Sultan",
+        "surname": "Mehmet",
+        "title": "İstanbul'un Fatihi",
+        "profession": "Padişah",
+        "birthDeath": "1432-1481",
+        "locationLink": "https://maps.google.com/?q=41.016793682313924,28.94845962524414",
+        "profileImage": "images/mehmet.png",
+        "coverImage": "images/topkapi-sarayi.webp",
+        "about": "II. Mehmed (Osmanlıca: محمد ثانی, Meḥmed-i Sânî; 30 Mart 1432, Edirne – 3 Mayıs 1481, Gebze), bilinen adıyla Fatih Sultan Mehmed (Osmanlıca: فاتح سلطان محمد, Fātiḥ Sultan Meḥmed), Osmanlı padişahı (1444-1446, 1451-1481). Babası II. Murad, annesi Hüma Hatun'dur. 12 yaşında tahta çıkmış, 21 yaşında ise İstanbul'u fethederek Orta Çağ'ın sona erip Yeni Çağ'ın başlamasına neden olmuştur. Hükümdarlığı sırasında Balkanlar'da önemli fetihler yapmış, Osmanlı topraklarını önemli ölçüde genişletmiştir.",
+        "additionalLocations": {
+            "Doğduğu Ev": [
+                "https://maps.google.com/?q=40.1914645,29.0456259,21",
+                "1450",
+                "Fatih Sultan Mehmet'in doğduğu yer",
+                ["images/fatihinevi.jpg","images/fatihinevi2.jpg","images/fatihinevi3.jpg","images/fatihinevi3.jpg"]
+            ],
+            "Topkapı Sarayı": [
+                "https://maps.google.com/?q=41.011,28.983",
+                "1478",
+                "Fatih Sultan Mehmet'in İstanbul'daki sarayı",
+                ["images/topkapi1.jpg", "images/topkapi2.jpg", "images/topkapi3.jpg", "images/topkapi4.jpg"]
+            ]
+        }
+    }
+]
+

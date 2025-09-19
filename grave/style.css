@@ -1,0 +1,395 @@
+*,
+body {
+    font-family: system-ui !important;
+}
+
+.cover {
+    position: relative;
+    height: 300px;
+    background-size: cover;
+    background-position: center;
+    border-top-left-radius: 30px;
+    border-top-right-radius: 30px;
+}
+
+.profile-img {
+    position: absolute;
+    bottom: -50px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid white;
+    object-fit: cover;
+}
+
+#profile-map {
+    height: 400px;
+    width: 100%;
+    margin-top: 60px;
+}
+
+.leaflet-div-icon {
+    background: none !important;
+    border: none !important;
+}
+
+.custom-marker {
+    position: relative;
+    width: 70px;
+    height: 100px;
+    background: url('pın.png') no-repeat center;
+    background-size: contain;
+    transition: transform 0.3s;
+    cursor: pointer;
+}
+
+.custom-marker:hover {
+    transform: scale(1.2);
+}
+
+.custom-marker img {
+    position: absolute;
+    top: 36%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 29px;
+    height: 29px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.additional-marker {
+    background: url('pın.png') no-repeat center;
+    background-size: contain;
+}
+
+.additional-marker span {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    font-size: 12px;
+    text-shadow: 1px 1px 2px black;
+}
+
+.details,
+.location-details {
+    padding: 20px;
+    border: 1px solid #ccc;
+    margin-top: 20px;
+}
+
+.location-details {
+    display: none;
+}
+
+.btn-back {
+    background-color: rgb(255, 255, 250);
+    color: black;
+    border: none;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+    border-radius: 5px;
+}
+
+.gallery {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.gallery img {
+    max-width: 300px;
+    border-radius: 10px;
+}
+/* -------------------------------
+   Global Custom Scrollbar
+---------------------------------*/
+
+/* Tüm kaydırılabilir alanlar için */
+* {
+    scrollbar-color: #D62929 #ffffff; /* Thumb ve track */
+}
+
+/* Webkit tarayıcılar için */
+*::-webkit-scrollbar {
+    width: 25px;                 /* Scrollbar genişliği */
+    height: 12px;                /* Yatay scrollbar için */
+}
+
+*::-webkit-scrollbar-track {
+    background: #F5F5F5;         /* Track rengi */
+    border-radius: 10px;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.1);
+}
+
+*::-webkit-scrollbar-thumb {
+    background-color: #D62929;   /* Thumb rengi */
+    border-radius: 10px;
+    box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    transition: background 0.3s ease;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+    background-color: #a71f1f;   /* Hover efekti */
+}
+
+/* İsteğe bağlı: sayfa scroll’u ile animasyon hissi */
+html {
+    scroll-behavior: smooth;
+}
+
+
+*,
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+#map {
+    height: 500px;
+}
+
+.leaflet-div-icon {
+    background: none !important;
+    border: none !important;
+}
+
+.custom-marker {
+    position: relative;
+    width: 70px;
+    height: 100px;
+    background: url('images/pın.png') no-repeat center;
+    background-size: contain;
+    transition: transform 0.3s;
+}
+
+.custom-marker:hover {
+    transform: scale(1.2);
+}
+
+.custom-marker img {
+    position: absolute;
+    top: 28%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 27px;
+    height: 27px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.details {
+    padding: 20px;
+    border: 1px solid #ccc;
+    margin-top: 20px;
+}
+
+.person-list {
+    height: 500px;
+    overflow-y: auto;
+    border-right: 1px solid #ccc;
+    display: flex;
+    /* block yerine flex */
+    flex-direction: column;
+    /* dikey sıralama */
+    padding: 10px;
+    background-color: #fff;
+    z-index: 1;
+}
+
+#person-list {
+    flex: 1;
+    /* listenin tüm boş alanı kaplaması */
+    overflow-y: auto;
+}
+
+.person-item {
+    display: flex !important;
+    gap: 10px;
+    cursor: pointer;
+    transition: transform 0.3s;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    background-color: #fff;
+    align-items: center;
+    /* dikey ortalama */
+}
+
+.person-item:hover {
+
+    background-color:rgb(247 247 247);
+
+}
+.person-item strong a {
+    color: #000; /* siyah */
+    text-decoration: none; /* istersen alt çizgiyi kaldır */
+}
+
+.person-item strong a:hover {
+    color: #007bff; /* hover efekti isteğe bağlı */
+}
+
+
+.person-image {
+    width: 30px;
+    height: 30px;
+    border: 1px solid #fff;
+    border-radius: 50%;
+    position: relative;
+    align-self: center;
+}
+
+.add-person-btn {
+    background-color: rgb(255, 255, 250);
+    color: black;
+    border: none;
+    box-shadow: rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px;
+    border-radius: 30px;
+    padding: 8px 15px;
+    font-weight: 700;
+    margin-top: auto;
+    text-decoration: none;
+    align-self: center;
+    width: 100%;
+    text-align: center;
+}
+
+.add-person-btn:hover {
+    background-color: #e0e0e0;
+    transform: scale(1.05);
+}
+
+
+.delete-btn {
+    background-color: #ff0909;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-left: auto;
+}
+
+.delete-btn:hover {
+    background-color: #cc0000;
+}
+
+.container {
+    padding-top: 60px;
+}
+
+
+.custom-header {
+    position: fixed;
+    top: 2%;
+    left: 2%;
+    width: calc(100% - 4%);
+    background-color: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 42px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    padding: 10px 8px 10px 61px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+}
+
+.header-home {
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.search-container {
+    position: relative;
+    flex-grow: 1;
+    max-width: 50%;
+    margin: 0 20px;
+}
+
+.header-search {
+    width: 100%;
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgb(0 0 0 / 14%);
+}
+
+.header-search:focus {
+    outline: none;
+    border-color: #000000;
+    color: #000000;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    background: rgba(255, 255, 255, 0.4);
+}
+
+.search-results {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    max-height: 300px;
+    overflow-y: auto;
+    z-index: 1001;
+    display: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.search-results.show {
+    display: block;
+}
+
+.search-result-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.search-result-item:hover {
+    background-color: #f0f0f0;
+}
+
+.search-result-item img {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.header-profile img {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #ccc;
+}
+
+@media (max-width: 768px) {
+    .custom-header {
+        left: 1%;
+        width: calc(100% - 2%);
+        padding: 8px 15px;
+    }
+
+    .header-home {
+        font-size: 1rem;
+    }
+
+    .search-container {
+        margin: 0 10px;
+    }
+
+}

@@ -1,0 +1,361 @@
+[
+    {
+        "id": 1,
+        "name": "Hasan",
+        "surname": "Kaya",
+        "category": "Çiçekç & Çelenk",
+        "bio": "Satıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini Tanıtacak",
+        "bannerImage": "https://aydinlatma.org/wp-content/uploads/2018/04/Cicekci-Aydinlatma-1024x576.jpg",
+        "profileImage": "https://images.freeimages.com/images/premium/previews/2910/29105846-male-florist-working-in-garden-center.jpg",
+        "coverImage": "https://aydinlatma.org/wp-content/uploads/2018/04/Cicekci-Aydinlatma-1024x576.jpg",
+        "tel": "+90 555 123 45 67",
+        "email": "hasan.kaya@example.com",
+        "address": "Kadıköy, İstanbul, Türkiye",
+        "locationLink": "https://maps.google.com/?q=40.985,29.025",
+        "examples": [
+            "images/cicek1.jpg",
+            "images/cicek2.png",
+            "images/cicek3.jpg"
+        ],
+        "packages": [
+            {
+                "oldPrice": "100 TL",
+                "newPrice": "80 TL",
+                "msg": "Çiçekçilik Hizmetinde %20 İndirim! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi commodo nisi mi, et tincidunt erat hendrerit at. Duis tincidunt ante vitae arcu tristique, vitae lacinia quam vulputate. Sed massa nibh",
+                "gradient": "linear-gradient(to right, purple, orange)"
+            },
+            {
+                "oldPrice": "150 TL",
+                "newPrice": "120 TL",
+                "msg": "Çelenk Tasarımında %20 İndirim! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi commodo nisi mi, et tincidunt erat hendrerit at. Duis tincidunt ante vitae arcu tristique, vitae lacinia quam vulputate. Sed massa nibh",
+                "gradient": "linear-gradient(to right, blue, red)"
+            },
+            {
+                "oldPrice": "150 TL",
+                "newPrice": "120 TL",
+                "msg": "Çelenk Tasarımında %20 İndirim! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi commodo nisi mi, et tincidunt erat hendrerit at. Duis tincidunt ante vitae arcu tristique, vitae lacinia quam vulputate. Sed massa nibh",
+                "gradient": "linear-gradient(to right, blue, red)"
+            },
+            {
+                "oldPrice": "150 TL",
+                "newPrice": "120 TL",
+                "msg": "Çelenk Tasarımında %20 İndirim! Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi commodo nisi mi, et tincidunt erat hendrerit at. Duis tincidunt ante vitae arcu tristique, vitae lacinia quam vulputate. Sed massa nibh",
+                "gradient": "linear-gradient(to right, blue, red)"
+            }
+        ],
+        "socialLinks": {
+            "facebook": "https://facebook.com/hasankaya.cicekci",
+            "instagram": "https://instagram.com/hasankaya.cicek",
+            "whatsapp": "https://wa.me/905551234567",
+            "website": "https://hasankaya-cicek.com",
+            "tiktok": "https://www.tiktok.com/@username"
+        }
+    },
+    {
+        "id": 2,
+        "name": "Mehmet",
+        "surname": "Demir",
+        "category": "Hoca",
+        "bio": "Satıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini Tanıtacak",
+        "bannerImage": "https://img.freepik.com/free-photo/mosque-interior_181624-15495.jpg",
+        "profileImage": "https://randomuser.me/api/portraits/men/32.jpg",
+        "coverImage": "images/hoca.png",
+        "tel": "+90 555 987 65 43",
+        "email": "mehmet.demir@example.com",
+        "address": "Çankaya, Ankara, Türkiye",
+        "locationLink": "https://maps.google.com/?q=39.933,32.859",
+        "examples": [
+            "images/hıca1.png",
+            "images/hıca2.png"
+        ],
+        "packages": [
+            {
+                "oldPrice": "200 TL",
+                "newPrice": "150 TL",
+                "msg": "Hoca Hizmetinde %25 İndirim!",
+                "gradient": "linear-gradient(to right, yellow, green)"
+            },
+            {
+                "oldPrice": "250 TL",
+                "newPrice": "200 TL",
+                "msg": "Özel Tören Paketinde %20 İndirim!",
+                "gradient": "linear-gradient(to right, cyan, magenta)"
+            },
+            {
+                "oldPrice": "250 TL",
+                "newPrice": "200 TL",
+                "msg": "Özel Tören Paketinde %20 İndirim!",
+                "gradient": "linear-gradient(to right, cyan, magenta)"
+            },
+            {
+                "oldPrice": "250 TL",
+                "newPrice": "200 TL",
+                "msg": "Özel Tören Paketinde %20 İndirim!",
+                "gradient": "linear-gradient(to right, cyan, magenta)"
+            }
+        ],
+        "socialLinks": {
+            "facebook": "https://facebook.com/mehmetdemir.hoca",
+            "instagram": "https://instagram.com/mehmetdemir_hoca",
+            "whatsapp": "https://wa.me/905559876543",
+            "website": "https://mehmetdemir-hoca.com",
+            "tiktok": "https://www.tiktok.com/@username"
+        }
+    },
+    {
+        "id": 3,
+        "name": "Ali",
+        "surname": "Çelik",
+        "category": "Mezar 3D Modellemeci",
+        "bio": "Satıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini TanıtacakSatıcı Detay Kısmı Bu Alanda Olacak İlgili Kısa Bir Açıklama İle Kendini Tanıtacak",
+        "bannerImage": "https://img.freepik.com/free-photo/3d-rendering-modern-architecture_23-2149054493.jpg",
+        "profileImage": "https://randomuser.me/api/portraits/men/45.jpg",
+        "coverImage": "images/3dmodel.png",
+        "tel": "+90 555 456 78 90",
+        "email": "ali.celik@example.com",
+        "address": "Bornova, İzmir, Türkiye",
+        "locationLink": "https://maps.google.com/?q=38.423,27.138",
+        "examples": [
+            "images/mezarmodel1.png",
+            "images/mezarmodel2.png",
+            "images/mezarmodel3.png"
+        ],
+        "packages": [
+            {
+                "oldPrice": "300 TL",
+                "newPrice": "250 TL",
+                "msg": "3D Modellemede %17 İndirim!",
+                "gradient": "linear-gradient(to right, green, blue)"
+            },
+            {
+                "oldPrice": "400 TL",
+                "newPrice": "320 TL",
+                "msg": "Özel 3D Tasarımda %20 İndirim!",
+                "gradient": "linear-gradient(to right, red, yellow)"
+            },
+            {
+                "oldPrice": "400 TL",
+                "newPrice": "320 TL",
+                "msg": "Özel 3D Tasarımda %20 İndirim!",
+                "gradient": "linear-gradient(to right, red, yellow)"
+            },
+            {
+                "oldPrice": "400 TL",
+                "newPrice": "320 TL",
+                "msg": "Özel 3D Tasarımda %20 İndirim!",
+                "gradient": "linear-gradient(to right, red, yellow)"
+            }
+        ],
+        "socialLinks": {
+            "facebook": "https://facebook.com/alicelik.3d",
+            "instagram": "https://instagram.com/alicelik_3dmodel",
+            "whatsapp": "https://wa.me/905554567890",
+            "website": "https://alicelik-3d.com",
+            "tiktok": "https://www.tiktok.com/@username"
+        }
+    },
+    {
+        "id": 4,
+        "name": "Zeynep",
+        "surname": "Yıldız",
+        "category": "Mermer Ustası",
+        "bio": "Uzun yıllardır mermer işçiliği yapıyorum. Kaliteli mezar taşları için hizmetinizdeyim.",
+        "bannerImage": "https://img.freepik.com/free-photo/marble-texture_1194-6181.jpg",
+        "profileImage": "https://randomuser.me/api/portraits/women/44.jpg",
+        "coverImage": "images/mermer.png",
+        "tel": "+90 555 234 56 78",
+        "email": "zeynep.yildiz@example.com",
+        "address": "Bursa, Osmangazi, Türkiye",
+        "locationLink": "https://maps.google.com/?q=40.185,29.060",
+        "examples": [
+            "images/mermer2.png",
+            "images/mermer3.png"
+        ],
+        "packages": [
+            {
+                "oldPrice": "500 TL",
+                "newPrice": "400 TL",
+                "msg": "Mermer Mezar Taşında %20 İndirim!",
+                "gradient": "linear-gradient(to right, pink, purple)"
+            },
+            {
+                "oldPrice": "600 TL",
+                "newPrice": "480 TL",
+                "msg": "Özel Mermer İşçiliğinde %20 İndirim!",
+                "gradient": "linear-gradient(to right, orange, blue)"
+            },
+            {
+                "oldPrice": "600 TL",
+                "newPrice": "480 TL",
+                "msg": "Özel Mermer İşçiliğinde %20 İndirim!",
+                "gradient": "linear-gradient(to right, orange, blue)"
+            },
+            {
+                "oldPrice": "600 TL",
+                "newPrice": "480 TL",
+                "msg": "Özel Mermer İşçiliğinde %20 İndirim!",
+                "gradient": "linear-gradient(to right, orange, blue)"
+            }
+        ],
+        "socialLinks": {
+            "facebook": "https://facebook.com/zeynepyildiz.mermer",
+            "instagram": "https://instagram.com/zeynepyildiz_mermer",
+            "whatsapp": "https://wa.me/905552345678",
+            "website": "https://zeynepyildiz-mermer.com",
+            "tiktok": "https://www.tiktok.com/@username"
+        }
+    },
+    {
+        "id": 5,
+        "name": "Ahmet",
+        "surname": "Şahin",
+        "category": "Mezar Bakım",
+        "bio": "Profesyonel mezar bakım ve temizlik hizmetleri sunuyorum.",
+        "bannerImage": "https://img.freepik.com/free-photo/landscape-cemetery_181624-5246.jpg",
+        "profileImage": "https://randomuser.me/api/portraits/men/21.jpg",
+        "coverImage": "images/mezarbakim.png",
+        "tel": "+90 555 789 12 34",
+        "email": "ahmet.sahin@example.com",
+        "address": "Adana, Seyhan, Türkiye",
+        "locationLink": "https://maps.google.com/?q=36.991,35.330",
+        "examples": [
+            "images/mezarbakim1.png",
+            "images/mezarbakim2.png"
+        ],
+        "packages": [
+            {
+                "oldPrice": "150 TL",
+                "newPrice": "120 TL",
+                "msg": "Mezar Bakımında %20 İndirim!",
+                "gradient": "linear-gradient(to right, teal, lime)"
+            },
+            {
+                "oldPrice": "200 TL",
+                "newPrice": "160 TL",
+                "msg": "Yıllık Bakım Paketinde %20 İndirim!",
+                "gradient": "linear-gradient(to right, magenta, yellow)"
+            },
+            {
+                "oldPrice": "200 TL",
+                "newPrice": "160 TL",
+                "msg": "Yıllık Bakım Paketinde %20 İndirim!",
+                "gradient": "linear-gradient(to right, magenta, yellow)"
+            },
+            {
+                "oldPrice": "200 TL",
+                "newPrice": "160 TL",
+                "msg": "Yıllık Bakım Paketinde %20 İndirim!",
+                "gradient": "linear-gradient(to right, magenta, yellow)"
+            }
+        ],
+        "socialLinks": {
+            "facebook": "https://facebook.com/ahmetshahin.bakim",
+            "instagram": "https://instagram.com/ahmetshahin_mezarbakim",
+            "whatsapp": "https://wa.me/905557891234",
+            "website": "https://ahmetshahin-bakim.com",
+            "tiktok": "https://www.tiktok.com/@username"
+        }
+    },
+    {
+        "id": 6,
+        "name": "Fatma",
+        "surname": "Karaca",
+        "category": "Çiçekç & Çelenk",
+        "bio": "Taze çiçek aranjmanları ve özel çelenk tasarımları yapıyorum.",
+        "bannerImage": "https://img.freepik.com/free-photo/beautiful-flower-arrangement_23-2149012467.jpg",
+        "profileImage": "https://randomuser.me/api/portraits/women/36.jpg",
+        "coverImage": "https://placehold.co/1920x400?text=Fatma+Karaca+Kapak",
+        "tel": "+90 555 345 67 89",
+        "email": "fatma.karaca@example.com",
+        "address": "Antalya, Muratpaşa, Türkiye",
+        "locationLink": "https://maps.google.com/?q=36.896,30.713",
+        "examples": [
+            "https://placehold.co/800x300?text=Çiçek+Buketi+1",
+            "https://placehold.co/800x300?text=Çelenk+Örneği+2"
+        ],
+        "packages": [
+            {
+                "oldPrice": "120 TL",
+                "newPrice": "100 TL",
+                "msg": "Çiçek Buketinde %17 İndirim!",
+                "gradient": "linear-gradient(to right, violet, coral)"
+            },
+            {
+                "oldPrice": "180 TL",
+                "newPrice": "150 TL",
+                "msg": "Çelenk Paketinde %17 İndirim!",
+                "gradient": "linear-gradient(to right, blue, pink)"
+            },
+            {
+                "oldPrice": "180 TL",
+                "newPrice": "150 TL",
+                "msg": "Çelenk Paketinde %17 İndirim!",
+                "gradient": "linear-gradient(to right, blue, pink)"
+            },
+            {
+                "oldPrice": "180 TL",
+                "newPrice": "150 TL",
+                "msg": "Çelenk Paketinde %17 İndirim!",
+                "gradient": "linear-gradient(to right, blue, pink)"
+            }
+        ],
+        "socialLinks": {
+            "facebook": "https://facebook.com/fatmakaraca.cicek",
+            "instagram": "https://instagram.com/fatmakaraca_cicekci",
+            "whatsapp": "https://wa.me/905553456789",
+            "website": "https://fatmakaraca-cicek.com",
+            "tiktok": "https://www.tiktok.com/@username"
+        }
+    },
+    {
+        "id": 7,
+        "name": "Murat",
+        "surname": "Aydın",
+        "category": "Yazıtçı",
+        "bio": "Mezar taşı yazıtları, özel oyma ve kazıma işlerinde deneyimliyim.",
+        "bannerImage": "https://img.freepik.com/free-photo/old-carved-stone-texture_181624-23654.jpg",
+        "profileImage": "https://randomuser.me/api/portraits/men/52.jpg",
+        "coverImage": "https://placehold.co/1920x400?text=Murat+Aydın+Kapak",
+        "tel": "+90 555 678 90 12",
+        "email": "murat.aydin@example.com",
+        "address": "Eskişehir, Odunpazarı, Türkiye",
+        "locationLink": "https://maps.google.com/?q=39.766,30.525",
+        "examples": [
+            "https://placehold.co/800x300?text=Yazıt+Örneği+1",
+            "https://placehold.co/800x300?text=Oyma+Çalışması+2"
+        ],
+        "packages": [
+            {
+                "oldPrice": "250 TL",
+                "newPrice": "200 TL",
+                "msg": "Yazıt İşçiliğinde %20 İndirim!",
+                "gradient": "linear-gradient(to right, navy, teal)"
+            },
+            {
+                "oldPrice": "350 TL",
+                "newPrice": "280 TL",
+                "msg": "Özel Oyma Paketinde %20 İndirim!",
+                "gradient": "linear-gradient(to right, gold, crimson)"
+            },
+            {
+                "oldPrice": "350 TL",
+                "newPrice": "280 TL",
+                "msg": "Özel Oyma Paketinde %20 İndirim!",
+                "gradient": "linear-gradient(to right, gold, crimson)"
+            },
+            {
+                "oldPrice": "350 TL",
+                "newPrice": "280 TL",
+                "msg": "Özel Oyma Paketinde %20 İndirim!",
+                "gradient": "linear-gradient(to right, gold, crimson)"
+            }
+        ],
+        "socialLinks": {
+            "facebook": "https://facebook.com/murataydin.yazitci",
+            "instagram": "https://instagram.com/murataydin_yazit",
+            "whatsapp": "https://wa.me/905556789012",
+            "website": "https://murataydin-yazit.com",
+            "tiktok": "https://www.tiktok.com/@username"
+        }
+    }
+]

@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harita Uygulaması</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <style>
+        /* Tam ekran intro katmanı */
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            z-index: 10000;
+            overflow: hidden;
+            transition: all 1s ease-in-out;
+        }
+
+        #intro-overlay.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+        .leaflet-control-container {
+  z-index: 1 !important; /* overlay’in altında kalsın */
+}
+
+        /* Intro animasyon stilleri */
+        #year {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(1);
+            z-index: 2;
+            text-align: center;
+            font-size: clamp(2rem, 10vw, 6rem);
+            font-weight: bold;
+            white-space: nowrap;
+            color: white;
+            transition: transform 0.1s linear, font-size 0.1s linear;
+        }
+
+        .bg {
+            position: fixed;
+            filter: brightness(0.5);
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 1;
+            transition: opacity 2s ease-in-out;
+            z-index: 1;
+        }
+
+        .bg.show {
+            opacity: 1;
+        }
+
+        /* Slider kapsayıcısı */
+        .slider-container {
+            position: relative;
+            width: 100%;
+            height: 500px;
+            overflow: hidden;
+            z-index: 1;
+            margin-top: 13vh;
+        }
+
+        /* Slider stilleri */
+        .slider {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            perspective: 1000px;
+            max-height: 100%;
+            max-width: 100%;
+            will-change: transform;
+        }
+
+        .slider:not(.zoom) .item {
+            transition: all 900ms ease-in-out, opacity 400ms linear 0ms;
+            opacity: 0;
+        }
+
+        .slider:not(.zoom) .item.active {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .slider:not(.zoom) .item.active span {
+            top: 0;
+            transform: scale(1);
+        }
+
+        .slider:not(.zoom) .item.active .btn {
+            transform: scale(1);
+            height: 44px;
+        }
+
+
+
+        .slider:not(.zoom) .item.item1 {
+            transform: rotateY(0deg) translateZ(0);
+        }
+
+        .slider:not(.zoom) .item.item2 {
+            transform: rotateY(120deg) translateZ(0);
+        }
+
+        .slider:not(.zoom) .item.item3 {
+            transform: rotateY(240deg) translateZ(0);
+        }
+
+        .slider.zoom .item {
+            transition: all 900ms ease-in-out, opacity 300ms linear 500ms;
+            opacity: 0.5;
+        }
+
+        .wrapper {
+            height: 100%;
+            width: 100%;
+            position: absolute;
+            transform-style: preserve-3d;
+            transition: transform 900ms ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            will-change: transform;
+        }
+
+        .item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            width: 39%;
+            height: 50%;
+            color: #fff;
+            background-repeat: no-repeat;
+            background-size: cover !important;
+            background-position: center;
+            transition: all 900ms ease-in-out;
+            transform-origin: center;
+            pointer-events: none;
+            will-change: transform;
+        }
+
+        .item.item1 {
+            transform: rotateY(0deg) translateZ(500px);
+            background-position: 50% 0%;
+        }
+
+        .item.item1.active {
+            transform: rotateY(0deg) translateZ(250px);
+            opacity: 1;
+        }
+
+        .item.item2 {
+            transform: rotateY(120deg) translateZ(500px);
+        }
+
+        .item.item2.active {
+            transform: rotateY(120deg) translateZ(250px);
+            opacity: 1;
+        }
+
+        .item.item3 {
+            transform: rotateY(240deg) translateZ(500px);
+        }
+
+        .item.item3.active {
+            transform: rotateY(240deg) translateZ(250px);
+            opacity: 1;
+        }
+
+        .item__info {
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: bold;
+            will-change: transform;
+        }
+
+        .item__year {
+            font-size: 30px;
+            letter-spacing: 3px;
+            margin-bottom: 35px;
+            overflow: hidden;
+            line-height: 30px;
+            will-change: transform;
+        }
+
+        .item__year span {
+            position: relative;
+            top: 27px;
+            transition: all 900ms linear;
+            display: inline-block;
+            transform: scale(0.7);
+            white-space: nowrap;
+            will-change: transform;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .item__name {
+            font-size: 55px;
+            letter-spacing: 3px;
+            margin-bottom: 62px;
+            overflow: hidden;
+            line-height: 55px;
+            will-change: transform;
+        }
+
+        .item__name span {
+            position: relative;
+            top: 48px;
+            transition: all 900ms ease-in-out;
+            display: inline-block;
+            transform: scale(0.7);
+            white-space: nowrap;
+            will-change: transform;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .btn {
+            background: #fff;
+            color: #120d0b;
+            padding: 0 33px;
+            text-decoration: none;
+            display: inline-block;
+            transform: scale(0.7);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+            transition: all 400ms ease-in-out;
+            will-change: transform;
+            align-content: center;
+        }
+
+        .btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .arrow {
+            background: rgba(142, 32, 55, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            position: absolute;
+            top: 50%;
+            z-index: 1;
+            transform: translateY(-50%);
+            cursor: pointer;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            transition: all 0.1s ease-in-out, backdrop-filter 0.3s ease-in-out, background 0.3s ease-in-out;
+            transform-origin: 50% 50%;
+            will-change: transform, backdrop-filter, background;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .arrow:hover {
+            transform: translateY(-50%) scale(1.1);
+            background: rgba(142, 32, 55, 0.5);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .arrow.arrow-next {
+            right: 1em;
+            background: url('https://alikinvv.github.io/3d-carousel/build/img/arrow-right.svg') no-repeat center rgb(255 0 53 / 30%);
+            background-size: 38px;
+        }
+
+        .arrow.arrow-prev {
+            left: 1em;
+            background: url('https://alikinvv.github.io/3d-carousel/build/img/arrow-left.svg') no-repeat center rgb(255 0 53 / 30%);
+            background-size: 38px;
+        }
+
+        @media (min-width: 1400px) {
+            .slider-container {
+                max-height: 700px;
+            }
+        }
+
+        /* Harita için yükseklik tanımla */
+        #map {
+            height: 400px;
+        }
+
+        /* Bölümler arasında boşluk ekle */
+        .row {
+            margin-bottom: 20px;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+        }
+
+        /* GitHub köşesi için animasyon (kullanılmıyorsa kaldırılabilir) */
+        @keyframes octocat-wave {
+
+            0%,
+            100% {
+                transform: rotate(0);
+            }
+
+            20%,
+            60% {
+                transform: rotate(-25deg);
+            }
+
+            40%,
+            80% {
+                transform: rotate(10deg);
+            }
+        }
+
+        @media (max-width: 500px) {
+            .github-corner:hover .octo-arm {
+                animation: none;
+            }
+
+            .github-corner .octo-arm {
+                animation: octocat-wave 560ms ease-in-out;
+            }
+
+            .item__name {
+                font-size: 30px;
+                line-height: 30px;
+            }
+
+            .item__year {
+                font-size: 20px;
+                line-height: 20px;
+            }
+
+            .arrow {
+                width: 50px;
+                height: 50px;
+                background-size: 24px !important;
+            }
+        }
+
+        /* index.html içeriği başlangıçta gizli */
+        .container,
+        #header-container {
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        .container.show,
+        #header-container.show {
+            opacity: 1;
+        }
+
+        /* NAVBAR */
+        .top-nav {
+            display: flex;
+            gap: 2rem;
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-btn {
+            text-decoration: none;
+            font-weight: bold;
+            color: #333;
+            padding: 0.5rem 1rem;
+            transition: text-shadow 0.25s ease;
+        }
+
+        .nav-btn:hover {
+            text-shadow: 0 0 0.1em #333;
+        }
+
+        .nav-btn.active {
+            color: #000;
+        }
+
+        .nav-indicator {
+            height: 3px;
+            border-radius: 2px;
+            position: absolute;
+            bottom: -5px;
+            background-color: #000;
+            transition: all 0.3s ease-in-out;
+            pointer-events: none;
+        }
+
+        .grave-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            cursor: pointer;
+        }
+
+        .grave-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .grave-image {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        #graves-map {
+            height: 400px;
+        }
+
+
+
+
+
+
+
+
+        .container-workers {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sol panel */
+        .sidebar {
+            width: 25%;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+        }
+
+        .sidebar input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .filter-item {
+            padding: 8px 24px;
+            cursor: pointer;
+            position: relative;
+            transition: background 0.3s;
+            margin-bottom: 8px;
+            border-radius: 5px;
+        }
+
+        .filter-item:hover {
+            background: #eee;
+        }
+
+        .filter-item.active {
+            background: #dff0d8;
+        }
+
+        .filter-item.active::before {
+            content: "✔";
+            position: absolute;
+            left: 8px;
+            color: green;
+            font-weight: bold;
+        }
+
+        /* Sağ panel */
+        .content {
+            width: 75%;
+            padding: 20px;
+        }
+
+        .content input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(13vw, 1fr));
+            gap: 2vw;
+            position: relative;
+        }
+
+        /* Worker kartları */
+        .worker-wrapper {
+            background: #fff;
+            border-radius: 40px;
+            box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.2);
+            font-size: 0;
+            opacity: 1;
+            transition: opacity 0.3s ease;
+            position: relative;
+        }
+
+        .worker-wrapper.fade-out {
+            opacity: 0;
+            pointer-events: none;
+            position: absolute;
+        }
+
+        .worker-wrapper.fade-in {
+            opacity: 1;
+            pointer-events: auto;
+            position: relative;
+        }
+
+        .worker-banner canvas {
+            display: block;
+            width: 100%;
+            height: 180px;
+            background-position: center center;
+            background-size: cover;
+            border-radius: 40px 40px 0 0;
+        }
+
+        .worker-details {
+            display: block;
+            padding: 100px 20px 20px;
+            position: relative;
+        }
+
+        .worker-dp {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto;
+            position: absolute;
+            top: -75px;
+            left: 0;
+            right: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: 0.3s all ease-in;
+        }
+
+        .worker-dp canvas {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid #000;
+            background-position: center;
+            background-size: cover;
+        }
+
+        .worker-name {
+            text-align: center;
+            z-index: 5;
+            position: relative;
+            margin-top: 0.5vh;
+        }
+
+        .worker-name h2 {
+            font-size: 20px;
+            line-height: 1;
+            color: #2d303a;
+            margin: 0;
+        }
+
+        .worker-name h2 span {
+            display: block;
+            font-size: 13px;
+            margin-top: 1vh;
+            margin-bottom: 2vh;
+            color: #666;
+            font-weight: 400;
+        }
+
+        .worker-bio {
+            max-height: 10vh;
+            overflow: hidden;
+        }
+
+        .worker-bio p {
+            font-size: 14px;
+            line-height: 20px;
+            color: #666;
+            text-align: left;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .worker-button {
+            display: block;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .worker-button a {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 200px;
+            height: 45px;
+            background: #e8c411;
+            color: #000;
+            margin: 0 auto;
+            border-radius: 40px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: 0.3s all ease-in;
+        }
+
+        .worker-dp:hover {
+            transform: scale(1.1);
+        }
+
+        .worker-button a:hover {
+            transform: scale(1.05);
+            background: #fbfb00;
+        }
+    </style>
+
+
+</head>
+
+<body>
+    <!-- Intro Animasyon Katmanı -->
+    <div id="intro-overlay">
+        <div id="year">0</div>
+        <div id="bg1" class="bg"></div>
+        <div id="bg2" class="bg"></div>
+    </div>
+
+    <div id="header-container"></div>
+    <!-- Slider Bölümü -->
+    <div class="row" >
+        <div class="col-12" style="padding: 0 !important;">
+            <div class="slider-container">
+                <div class="slider">
+                    <div class="arrow arrow-prev"></div>
+                    <div class="wrapper" id="slider-wrapper">
+                        <!-- Dinamik olarak doldurulacak -->
+                    </div>
+                    <div class="arrow arrow-next"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Harita ve Kişi Listesi Bölümü -->
+        <!-- NAVBAR -->
+        <nav class="top-nav">
+            <a href="#" class="nav-btn active" data-target="persons-row">Kişiler</a>
+            <a href="#" class="nav-btn" data-target="sell-grave-row">Satılık Mezarlar</a>
+            <a href="#" class="nav-btn" data-target="workers-row">Çalışanlar</a>
+            <div class="nav-indicator"></div>
+        </nav>
+
+    </div>
+    <!-- ROWLAR -->
+    <div class="row persons-row">
+        <div class="col-md-4 person-list">
+            <h4>Kişiler</h4>
+            <div id="person-list"></div>
+            <a href="/grave/add-person.html" class="add-person-btn">Kişi Ekle</a>
+        </div>
+        <div class="col-md-8">
+            <h1>Harita Üzerinde Kişiler</h1>
+            <div id="map"></div>
+        </div>
+    </div>
+
+    <div class="row sell-grave-row" style="display:none;">
+        <div class="col-md-4 graves-list">
+            <h4>Satılık Mezarlar</h4>
+            <div id="graves-list"></div>
+        </div>
+        <div class="col-md-8">
+            <h1>Harita Üzerinde Mezar Konumları</h1>
+            <div id="graves-map" style="height: 400px;"></div>
+        </div>
+    </div>
+
+        <!-- Çalışanlar Sekmesi -->
+        <div class="row workers-row" style="display:none;">
+            <div class="container-workers">
+                <!-- Sol Panel -->
+                <div class="sidebar">
+                    <input type="text" id="sidebarSearch" placeholder="Kategorilerde ara...">
+                    <div id="filterList"></div>
+                </div>
+                <!-- Sağ Panel -->
+                <div class="content">
+                    <input type="text" id="contentSearch" placeholder="Kartlarda ara...">
+                    <div class="grid" id="workerGrid"></div>
+                </div>
+            </div>
+        </div>
+
+        
+    <div class="row">
+        <div class="col-md-12">
+            <div id="details" class="details"></div>
+        </div>
+    </div>
+
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <script src="/grave/script.js"></script>
+
+    <script>
+
+document.addEventListener("DOMContentLoaded", async () => {
+    // Header'ı yükle (her sayfada bir kez)
+    const headerContainer = document.getElementById('header-container');
+    if (headerContainer) {
+        try {
+            const headerResponse = await fetch('/grave/header.html');
+            if (headerResponse.ok) {
+                headerContainer.innerHTML = await headerResponse.text();
+                console.log('Header yüklendi');
+            } else {
+                console.warn('Header yüklenemedi:', headerResponse.status);
+            }
+        } catch (error) {
+            console.error('Header yükleme hatası:', error);
+        }
+    }
+
+    // Header olaylarını bağla (arama kutusu, ana sayfa, profil)
+    const searchInput = document.querySelector('.header-search');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            searchPersons(e.target.value, window.persons || [], window.workers || []);
+        });
+        searchInput.addEventListener('blur', () => {
+            setTimeout(() => {
+                const searchResults = document.getElementById('search-results');
+                if (searchResults) searchResults.classList.remove('show');
+            }, 200);
+        });
+    }
+
+    const homeLink = document.querySelector('.header-home');
+    if (homeLink) {
+        homeLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.href = '/grave/index.html';
+        });
+    }
+
+    const profileImg = document.querySelector('.header-profile img');
+    if (profileImg) {
+        profileImg.addEventListener('click', () => {
+            window.location.href = '/grave/profile.html';
+        });
+    }
+
+    // Sayfa'ya özgü fonksiyonu çağır (header sonrası)
+    if (window.location.pathname.includes('profile.html')) {
+        loadProfileData();
+    } else if (window.location.pathname.includes('worker-profile.html')) {
+        loadWorkerProfile();
+    } else {
+        loadDataAndHeader(); // Veri yükleme, header hariç
+    }
+});
+
+
+        // Intro animasyon verileri
+        const currentYear = new Date().getFullYear();
+        const yearEl = document.getElementById("year");
+        const leaders = [
+            { img: "images/img1.png" },
+            { img: "images/img2.jpg" },
+            { img: "images/img3.jpg" },
+            { img: "images/img4.png" },
+            { img: "images/img5.jpg" },
+            { img: "images/img6.jpg" },
+            { img: "images/img7.jpg" },
+            { img: "images/img8.jpg" },
+            { img: "images/img9.jpg" },
+            { img: "images/img10.png" },
+            { img: "images/img11.jpg" },
+            { img: "images/img12.jpg" },
+            { img: "images/img13.jpg" },
+            { img: "images/img14.jpg" },
+            { img: "images/img15.jpg" },
+            { img: "images/img16.jpg" },
+            { img: "images/img17.jpg" },
+            { img: "images/img18.jpg" },
+            { img: "images/img19.jpg" },
+            { img: "images/img20.jpg" }
+        ];
+        const lastImages = [
+            { year: currentYear - 2, img: "images/cengiz2.jpg" },
+            { year: currentYear - 1, img: "images/Fatih-Sultan-Mehmet-800x315.jpg" },
+            { year: currentYear, img: "images/3dduvarkagitlari-1c90ebc2.jpg" }
+        ];
+        let activeBg = 1;
+        const bg1 = document.getElementById("bg1");
+        const bg2 = document.getElementById("bg2");
+        const introOverlay = document.getElementById("intro-overlay");
+
+        // Preload
+        leaders.concat(lastImages).forEach(item => { new Image().src = item.img; });
+
+        function changeBackground(imgUrl) {
+            const nextBg = activeBg === 1 ? bg2 : bg1;
+            const prevBg = activeBg === 1 ? bg1 : bg2;
+            nextBg.style.backgroundImage = `url(${imgUrl})`;
+            nextBg.classList.add("show");
+            prevBg.classList.remove("show");
+            activeBg = activeBg === 1 ? 2 : 1;
+        }
+
+        function getRandomLeaderImage() {
+            return leaders[Math.floor(Math.random() * leaders.length)].img;
+        }
+
+        function animateYears() {
+            return new Promise(resolve => {
+                const fastEnd = currentYear - 3;
+                const fastDuration = 3000;
+                const startTime = performance.now();
+
+                function fastAnimate(now) {
+                    const progress = (now - startTime) / fastDuration;
+                    let year = Math.floor(progress * fastEnd);
+                    if (year > fastEnd) year = fastEnd;
+                    yearEl.textContent = year;
+                    yearEl.style.transform = "translate(-50%, -50%) scale(1)";
+                    if (year % 10 === 0 && year !== 0) changeBackground(getRandomLeaderImage());
+                    if (year < fastEnd) requestAnimationFrame(fastAnimate);
+                    else animateLastYears();
+                }
+
+                function animateLastYears() {
+                    let startScale = 1;
+                    let endScale = 6;
+                    let duration = 3000; // 3 saniye boyunca büyüme
+                    let startTime = performance.now();
+
+                    function scaleAnimate(now) {
+                        let t = (now - startTime) / duration;
+                        if (t > 1) t = 1;
+                        let scale = startScale + t * (endScale - startScale);
+                        yearEl.style.transform = `translate(-50%, -50%) scale(${scale})`;
+                        yearEl.style.opacity = 1; // büyürken sabit görünsün
+
+                        let currentIdx = Math.floor(t * lastImages.length);
+                        if (currentIdx >= lastImages.length) currentIdx = lastImages.length - 1;
+                        yearEl.textContent = lastImages[currentIdx].year;
+                        changeBackground(lastImages[currentIdx].img);
+
+                        if (t < 1) {
+                            requestAnimationFrame(scaleAnimate);
+                        } else {
+                            // Son yıl ekranda sabit kalsın 1 saniye
+                            setTimeout(() => {
+                                // Sonrasında kaybolma animasyonu
+                                yearEl.style.transition = "opacity 1s ease";
+                                yearEl.style.opacity = 0;
+
+                                // Intro küçülme
+                                const sliderContainer = document.querySelector('.slider-container');
+                                const rect = sliderContainer.getBoundingClientRect();
+                                introOverlay.style.transition = 'all 1s ease-in-out';
+                                introOverlay.style.width = `${rect.width}px`;
+                                introOverlay.style.height = `${rect.height}px`;
+                                introOverlay.style.top = `${rect.top + window.scrollY}px`;
+                                introOverlay.style.left = `${rect.left + window.scrollX}px`;
+                                introOverlay.style.transform = 'translate(0, 0)';
+                                setTimeout(() => {
+                                    introOverlay.classList.add('hide');
+                                    document.querySelector('.container').classList.add('show');
+                                    document.querySelector('#header-container').classList.add('show');
+                                    setTimeout(() => introOverlay.remove(), 1000);
+                                }, 1000);
+                                resolve();
+                            }, 1000);
+                        }
+                    }
+                    requestAnimationFrame(scaleAnimate);
+                }
+
+                requestAnimationFrame(fastAnimate);
+            });
+        }
+
+        const allImages = leaders.map(l => l.img).concat(lastImages.map(l => l.img));
+
+        // Eğer animasyon daha önce gösterilmediyse çalıştır
+if (!localStorage.getItem("introPlayed")) {
+    // Scroll kapat
+    document.body.style.overflow = 'hidden';
+
+    Promise.all(allImages.map(src => new Promise(resolve => {
+        const img = new Image();
+        img.src = src;
+        img.onload = img.onerror = resolve;
+    }))).then(() => {
+        changeBackground(getRandomLeaderImage());
+        animateYears().then(() => {
+            console.log("Intro animasyonu tamamlandı!");
+            localStorage.setItem("introPlayed", "true");
+
+            // Scroll tekrar aç
+            document.body.style.overflow = '';
+        });
+    });
+} else {
+    introOverlay.style.display = "none";
+    document.querySelector('.container').classList.add('show');
+    document.querySelector('#header-container').classList.add('show');
+}
+
+
+        //----------------------------------------------------------------------------------------------------------//
+        // Örnek persons dizisi (gerçek verilerinle değiştir)
+        const persons = [
+            {
+                "id": 1,
+                "name": "Osman",
+                "surname": "Gazi",
+                "title": "Osmanlı'nın Kurucusu",
+                "profession": "Padişah",
+                "birthDeath": "1258-1326",
+                "locationLink": "https://maps.google.com/?q=40.123456, 29.123456",
+                "profileImage": "images/osman-gazi.jpg",
+                "coverImage": "images/osmangazi.png"
+            },
+            {
+                "id": 2,
+                "name": "Yavuz Sultan",
+                "surname": "Selim",
+                "title": "Selîmî",
+                "profession": "Padişah",
+                "birthDeath": "1470-1520",
+                "locationLink": "https://www.google.com/maps?q=41.0082,28.9784",
+                "profileImage": "images/ahmet.jpg",
+                "coverImage": "images/kapakresim.webp"
+            },
+            {
+                "id": 3,
+                "name": "Fatih Sultan",
+                "surname": "Mehmet",
+                "title": "İstanbul'un Fatihi",
+                "profession": "Padişah",
+                "birthDeath": "1432-1481",
+                "locationLink": "https://maps.google.com/?q=41.016793682313924,28.94845962524414",
+                "profileImage": "images/mehmet.png",
+                "coverImage": "images/topkapi-sarayi.webp"
+            }
+        ];
+
+        // Türkçe karakterleri Latin harflerine çeviren ve slug oluşturan fonksiyon
+        function createUrlSlug(name, surname) {
+            const turkishToLatin = str => str
+                .replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i')
+                .replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u')
+                .replace(/Ç/g, 'c').replace(/Ğ/g, 'g').replace(/İ/g, 'i')
+                .replace(/Ö/g, 'o').replace(/Ş/g, 's').replace(/Ü/g, 'u');
+            return `${turkishToLatin(name.toLowerCase())}${turkishToLatin(surname.toLowerCase())}`;
+        }
+
+        // persons dizisine slug ekle
+        persons.forEach(p => {
+            p.urlSlug = createUrlSlug(p.name, p.surname);
+        });
+
+        // Slider'ı dinamik olarak doldur
+        const sliderWrapper = document.getElementById('slider-wrapper');
+        persons.forEach((person, index) => {
+            const item = document.createElement('div');
+            item.className = `item item${index + 1} ${index === 0 ? 'active' : ''}`;
+            item.style.backgroundImage = `url('${person.coverImage || 'https://via.placeholder.com/800x600'}')`;
+
+            // Artık slug doğrudan kullanılacak
+            item.innerHTML = `
+        <div class="item__info">
+            <p class="item__year"><span>${person.birthDeath || 'Bilinmiyor'}</span></p>
+            <p class="item__name"><span>${person.name} ${person.surname}</span></p>
+            <a href="/grave/profile.html?${person.urlSlug}" class="btn"><span>Profile Git</span></a>
+        </div>
+    `;
+            sliderWrapper.appendChild(item);
+        });
+
+        // === Slider JavaScript (sonsuz döngü için güvenli versiyon) ===
+        let slider = document.querySelector('.slider');
+        let wrapper = document.querySelector('.wrapper');
+        let next = document.querySelector('.arrow-next');
+        let prev = document.querySelector('.arrow-prev');
+
+        // items'ı persons eklendikten sonra alıyoruz
+        let items = document.querySelectorAll('.item');
+        let deg = 360 / items.length; // her slide için açı (esnek)
+        let currDeg = 0;
+        let active = 0;
+        let isAnimating = false;
+        let autoPlayInterval;
+
+        // Eğer CSS'de transition yoksa burada garantiye alıyoruz
+        if (!wrapper.style.transition) wrapper.style.transition = 'transform 0.9s ease';
+
+        // Otomatik oynatma fonksiyonu
+        function startAutoPlay() {
+            clearInterval(autoPlayInterval); // Önceki interval'i temizle
+            autoPlayInterval = setInterval(() => {
+                if (!isAnimating) {
+                    next.click(); // next olayını tetikle
+                }
+            }, 5000); // Her 2 saniyede bir
+        }
+
+        // İlk başta otomatik oynatmayı başlat
+        startAutoPlay();
+
+        next.addEventListener('click', () => {
+            if (isAnimating) return; // Animasyon bitene kadar yeni tıklamayı engelle
+            isAnimating = true;
+            slider.classList.add('zoom');
+            currDeg -= deg; // Sürekli azaltarak sonsuz döngü
+            wrapper.style.transform = `rotateY(${currDeg}deg)`;
+            active = (active + 1) % items.length;
+            startAutoPlay(); // Tıklama sonrası otomatik oynatmayı sıfırla
+        });
+
+        prev.addEventListener('click', () => {
+            if (isAnimating) return;
+            isAnimating = true;
+            slider.classList.add('zoom');
+            currDeg += deg;
+            wrapper.style.transform = `rotateY(${currDeg}deg)`;
+            active = (active - 1 + items.length) % items.length;
+            startAutoPlay(); // Tıklama sonrası otomatik oynatmayı sıfırla
+        });
+
+        // Transform bitince active class'ı güncelle, zoom'u kaldır ve tıklamaya izin ver
+        wrapper.addEventListener('transitionend', (e) => {
+            if (e.propertyName !== 'transform') return; // Sadece transform bittiğinde çalış
+            items.forEach(i => i.classList.remove('active'));
+            items[active].classList.add('active');
+            slider.classList.remove('zoom');
+            isAnimating = false;
+        });
+
+        // Eğer dinamik olarak yeni item ekliyorsanız (ör. ajax ile) çağırın:
+        function recomputeSlider() {
+            items = document.querySelectorAll('.item');
+            deg = 360 / items.length;
+            startAutoPlay(); // Yeni item eklenirse otomatik oynatmayı sıfırla
+        }
+    
+     const filterItems = document.querySelectorAll(".filter-item");
+        const workers = document.querySelectorAll(".worker-wrapper");
+        const sidebarSearch = document.getElementById("sidebarSearch");
+        const contentSearch = document.getElementById("contentSearch");
+
+        sidebarSearch.addEventListener("input", () => {
+            const term = sidebarSearch.value.toLowerCase();
+            filterItems.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                item.style.display = text.includes(term) ? "block" : "none";
+            });
+        });
+
+        function applyFilters() {
+            const activeFilters = Array.from(filterItems)
+                .filter(f => f.classList.contains("active"))
+                .map(f => f.dataset.value.toLowerCase());
+            const searchText = contentSearch.value.toLowerCase();
+
+            workers.forEach(worker => {
+                const category = worker.dataset.category.toLowerCase();
+                const text = worker.innerText.toLowerCase();
+                const matchesFilter = activeFilters.length === 0 || activeFilters.includes(category);
+                const matchesSearch = searchText.length === 0 || text.includes(searchText);
+
+                if (matchesFilter && matchesSearch) {
+                    worker.classList.remove("fade-out");
+                    worker.classList.add("fade-in");
+                } else {
+                    worker.classList.remove("fade-in");
+                    worker.classList.add("fade-out");
+                }
+            });
+        }
+
+        filterItems.forEach(item => {
+            item.addEventListener("click", () => {
+                item.classList.toggle("active");
+                applyFilters();
+            });
+        });
+
+        contentSearch.addEventListener("input", applyFilters);
+    </script>
+
+</body>
+
+</html>

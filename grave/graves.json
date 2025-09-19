@@ -1,0 +1,34 @@
+[
+    {
+        "id": 1,
+        "sellerName": "Ali",
+        "sellerSurname": "Yılmaz",
+        "locationLink": "https://maps.google.com/?q=41.0135812,29.0202148,18.75",
+        "price": "50,000 TL",
+        "details": "Şehir merkezine yakın, bakımlı mezarlık alanı",
+        "profileImage": "images/ali-yilmaz.jpg",
+        "graveImages": [
+            "images/mezar2.jpg",
+            "images/mezar3.jpg",
+            "images/mezar4.jpg",
+            "images/mezar5.jpg"
+        ]
+    },
+    {
+        "id": 2,
+        "sellerName": "Ayşe",
+        "sellerSurname": "Demir",
+        "locationLink": "https://maps.google.com/?q=41.0515771,28.9339225,16.75",
+        "price": "40,000 TL",
+        "details": "Sessiz ve huzurlu bir konum",
+        "profileImage": "images/ayse-demir.jpg",
+        "graveImages": [
+            "images/mezar6.jpg",
+            "images/mezar7.jpg",
+            "images/mezar8.jpg",
+            "images/mezar9.jpg"
+       
+     ]
+
+    }
+]

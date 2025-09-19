@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Çalışan Profili</title>
+    <link rel="stylesheet" href="/grave/style.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+
+        .cover-image {
+            width: 100%;
+            height: 50vh;
+            max-height: 400px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        .profile-pic {
+            width: 20vw;
+            min-width: 100px;
+            max-width: 200px;
+            height: 20vw;
+            min-height: 100px;
+            max-height: 200px;
+            border-radius: 50%;
+            position: absolute;
+            bottom: -25%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 4px solid white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            background-size: cover;
+            background-position: center;
+            z-index: 10;
+        }
+
+        .profile-container {
+            position: relative;
+            text-align: center;
+            margin-top: 6vw;
+            /* Profil resminin altından başlasın */
+            padding: 1rem;
+        }
+
+        .slider-container {
+            width: 100%;
+            overflow: hidden;
+
+            position: relative;
+        }
+
+        .slider {
+            display: flex;
+            transition: transform 0.5s ease;
+        }
+
+        .slide {
+            min-width: 100%;
+            box-sizing: border-box;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 40vw;
+            max-height: 300px;
+            object-fit: cover;
+        }
+
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            font-size: 1.2rem;
+            z-index: 5;
+        }
+
+        .arrow-left {
+            left: 0.5rem;
+        }
+
+        .arrow-right {
+            right: 0.5rem;
+        }
+
+        .bio {
+            padding: 2rem 1rem 1rem 1rem;
+            width: 99%;
+            text-align: center;
+            font-size: 1rem;
+            position: relative;
+            left: 0.5vw;
+            box-shadow: rgba(0, 0, 0, 0.19) 0px 10px 20px, rgba(0, 0, 0, 0.23) 0px 6px 6px;
+            border-radius: 0px 0px 10px 10px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-top: 4vh;
+        }
+
+        .contact,
+        .address {
+            width: 45%;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .mini-map {
+            width: 100%;
+            height: 30vw;
+            min-height: 150px;
+            max-height: 200px;
+            margin-top: 0.5rem;
+            border-radius: 8px;
+        }
+
+        .social-icons {
+            width: 100%;
+            text-align: center;
+            margin: 1.5rem 0;
+            padding: 0 1rem;
+        }
+
+        .sm {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .link {
+            display: flex;
+            justify-content: center;
+            /* yatay ortalama */
+            align-items: center;
+            /* dikey ortalama */
+            width: 90px;
+            height: 90px;
+            margin: 10px;
+            border-radius: 30%;
+            box-shadow: 9px 9px 18px #bebebe, -9px -9px 18px #fff;
+            position: relative;
+            overflow: hidden;
+            font-size: 7vh;
+            /* ikon boyutu */
+            transition: 0.8s;
+        }
+
+        .link .iconify {
+            font-size: 40px;
+            /* ikon büyüklüğü */
+        }
+
+        /* TikTok */
+        .tiktok {
+            color: #222;
+            position: relative;
+            display: flex;
+            transition: color 0.3s ease-in-out;
+        }
+
+        .tiktok:hover {
+            color: #f1f1f1;
+        }
+
+        .tiktok::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            z-index: -1;
+            transition: transform 0.3s ease-in-out;
+            transform: scale(0);
+            background: #010101;
+            /* TikTok siyah */
+        }
+
+        .tiktok:hover::before {
+            transform: scale(1.2);
+        }
+
+        /* Genel ikon renkleri */
+        .yt,
+        .fb,
+        .ig,
+        .wa,
+        .tweet,
+        .website {
+            color: #222;
+            position: relative;
+            display: flex;
+            transition: color 0.3s ease-in-out;
+        }
+
+        /* Hover durumunda beyaz */
+        .yt:hover,
+        .fb:hover,
+        .ig:hover,
+        .wa:hover,
+        .tweet:hover,
+        .website:hover {
+            color: #f1f1f1;
+        }
+
+        /* Arkaplan efektleri */
+        .yt::before,
+        .fb::before,
+        .ig::before,
+        .wa::before,
+        .tweet::before,
+        .website::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            z-index: -1;
+            transition: transform 0.3s ease-in-out;
+            transform: scale(0);
+        }
+
+        /* YouTube */
+        .yt::before {
+            background: #ff0000;
+        }
+
+        /* Facebook */
+        .fb::before {
+            background: #1877f2;
+        }
+
+        /* Instagram */
+        .ig::before {
+            background: #e4405f;
+        }
+
+        /* WhatsApp */
+        .wa::before {
+            background: #25d366;
+        }
+
+        /* Twitter */
+        .tweet::before {
+            background: #1da1f2;
+        }
+
+        /* Website */
+        .website::before {
+            background: #6c757d;
+        }
+
+        /* Hover büyüme efekti */
+        .yt:hover::before,
+        .fb:hover::before,
+        .ig:hover::before,
+        .wa:hover::before,
+        .tweet:hover::before,
+        .website:hover::before {
+            transform: scale(1.2);
+        }
+
+        .packages {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            padding: 1rem;
+            justify-content: center;
+            /* grid tüm satırı ortalar */
+            justify-items: center;
+            /* her bir grid elemanını ortalar */
+            align-items: start;
+            /* elemanlar üstten başlar */
+        }
+
+        .package-card {
+            border-radius: 15px;
+            box-shadow: 1px 11px 9px rgba(0, 0, 0, 0.1);
+            padding: 1rem;
+            text-align: center;
+            position: relative;
+            width: 14vw;
+            height: 36vh;
+            overflow: hidden;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .package-card:hover {
+            transform: translateY(-4px);
+            height: auto;
+            /* kart yükseklik animasyonu için */
+        }
+
+
+        .package-card:hover {
+            max-height: 500px;
+            /* yeterince büyük bir değer veriyoruz */
+        }
+
+
+        .divider {
+            height: 5px;
+            margin: 0.5rem 0;
+            border-radius: 5px;
+        }
+
+        .old-price {
+            text-decoration: line-through;
+            color: red;
+            font-size: 1.3rem;
+            text-align: right;
+        }
+
+        .new-price {
+            font-weight: bold;
+            font-size: 3.2rem;
+            color: green;
+        }
+
+        .campaign-msg {
+            margin-top: 0.5rem;
+            font-style: italic;
+            font-size: 0.9rem;
+            height: 18vh;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+            /* yumuşak geçiş */
+        }
+
+        .campaign-msg:hover {
+            height: max-content;
+
+        }
+
+        .get-directions-btn {
+            background: white;
+            color: #0056b3;
+            border: none;
+            padding: 0.5rem 4rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            margin-top: 0.5rem;
+            border: 1px solid #0056b3;
+        }
+
+        .get-directions-btn:hover {
+            background: #208bff21;
+        }
+
+        /* Mobil için medya sorguları */
+        @media (max-width: 768px) {
+            .cover-image {
+                height: 40vh;
+            }
+
+            .profile-pic {
+                width: 25vw;
+                min-width: 80px;
+                max-width: 200px;
+                height: 25vw;
+                min-height: 80px;
+                max-height: 200px;
+                bottom: -25%;
+            }
+
+            .profile-container {
+                margin-top: 18vw;
+            }
+
+            .slide img {
+                height: 50vw;
+                max-height: 250px;
+            }
+
+            .info-row {
+                flex-direction: column;
+            }
+
+            .contact,
+            .address {
+                width: 100%;
+                text-align: center;
+            }
+
+            .mini-map {
+                height: 40vw;
+                max-height: 180px;
+            }
+
+            .link {
+                width: 70px;
+                height: 70px;
+                margin: 5px;
+                line-height: 70px;
+                font-size: 25px;
+            }
+
+            .link .iconify {
+                font-size: 30px;
+            }
+
+            .packages {
+                grid-template-columns: 1fr;
+                justify-items: center;
+            }
+
+            .package-card {
+                padding: 0.8rem;
+                height: 36vh;
+                width: 90vw;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .cover-image {
+                height: 35vh;
+            }
+
+            .profile-pic {
+                width: 30vw;
+                min-width: 70px;
+                max-width: 150px;
+                height: 30vw;
+                min-height: 70px;
+                max-height: 150px;
+                bottom: -16%;
+            }
+
+            .profile-container {
+                margin-top: 22vw;
+            }
+
+            .slide img {
+                height: 60vw;
+                max-height: 200px;
+            }
+
+            .arrow {
+                padding: 0.3rem 0.8rem;
+                font-size: 1rem;
+            }
+
+            .bio {
+                font-size: 0.9rem;
+            }
+
+            .contact h3,
+            .address h3 {
+                font-size: 1rem;
+            }
+
+            .mini-map {
+                height: 50vw;
+                max-height: 150px;
+            }
+
+            .link {
+                width: 60px;
+                height: 60px;
+                margin: 3px;
+                line-height: 60px;
+                font-size: 20px;
+            }
+
+            .link .iconify {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="header-container"></div>
+
+    <div class="cover-image" id="coverImage">
+        <div class="profile-pic" id="profilePic"></div>
+    </div>
+
+
+    <div class="profile-container">
+        <h1 id="workerName"></h1>
+    </div>
+
+    <div class="slider-container">
+        <div class="slider" id="workSlider"></div>
+        <button class="arrow arrow-left" onclick="slideLeft()">&lt;</button>
+        <button class="arrow arrow-right" onclick="slideRight()">&gt;</button>
+    </div>
+
+    <div class="bio" id="workerBio">
+        <p>Açıklama metni burada olacak.</p>
+    </div>
+
+    <div class="info-row">
+        <div class="contact">
+            <h3>İletişim</h3>
+            <p>Telefon: <span id="tel"></span></p>
+            <p>E-posta: <span id="email"></span></p>
+        </div>
+        <div class="address">
+            <h3>Adres</h3>
+            <p id="addressText"></p>
+            <div class="mini-map" id="miniMap"></div>
+            <button class="get-directions-btn" onclick="getDirections()">Yol Tarifi Al</button>
+        </div>
+    </div>
+
+
+    <div class="social-icons" id="socialIcons"></div>
+
+    <div class="packages" id="packages"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://code.iconify.design/2/2.2.1/iconify.min.js"></script>
+
+    <script src="script.js"></script>
+    <script>
+        function getCoordinates(locationLink) {
+            if (!locationLink || typeof locationLink !== 'string') {
+                console.warn('Location link eksik veya geçersiz:', locationLink);
+                return [41.0082, 28.9784]; // Varsayılan İstanbul
+            }
+            const match = locationLink.match(/q=([-]?[\d.]+),([-]?[\d.]+)/);
+            if (!match || match.length < 3) {
+                console.warn(`Geçersiz locationLink formatı: ${locationLink}`);
+                return [41.0082, 28.9784];
+            }
+            const lat = parseFloat(match[1]);
+            const lon = parseFloat(match[2]);
+            if (isNaN(lat) || isNaN(lon)) {
+                console.warn(`Geçersiz koordinatlar: ${locationLink}, lat: ${lat}, lon: ${lon}`);
+                return [41.0082, 28.9784];
+            }
+            return [lat, lon];
+        }
+
+        function createUrlSlug(name, surname) {
+            const turkishToLatin = str => str
+                .replace(/ç/g, 'c').replace(/ğ/g, 'g').replace(/ı/g, 'i')
+                .replace(/ö/g, 'o').replace(/ş/g, 's').replace(/ü/g, 'u')
+                .replace(/Ç/g, 'C').replace(/Ğ/g, 'G').replace(/İ/g, 'I')
+                .replace(/Ö/g, 'O').replace(/Ş/g, 'S').replace(/Ü/g, 'U');
+            return `${turkishToLatin((name || '').toLowerCase())}${turkishToLatin((surname || '').toLowerCase())}`;
+        }
+
+        let currentSlide = 0;
+        function slideLeft() {
+            const slider = document.getElementById('workSlider');
+            const slides = slider.children;
+            currentSlide = (currentSlide > 0) ? currentSlide - 1 : slides.length - 1;
+            slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+        }
+        function slideRight() {
+            const slider = document.getElementById('workSlider');
+            const slides = slider.children;
+            currentSlide = (currentSlide < slides.length - 1) ? currentSlide + 1 : 0;
+            slider.style.transform = `translateX(-${currentSlide * 100}%)`;
+        }
+
+        let workersCache = null; // Workers verisini önbelleğe almak için
+        async function loadWorkers() {
+            if (workersCache) return workersCache;
+            const response = await fetch('/grave/workers.json');
+            if (!response.ok) {
+                throw new Error(`workers.json bulunamadı: ${response.status}`);
+            }
+            workersCache = await response.json();
+            console.log('Yüklenen çalışanlar:', workersCache.map(w => ({ id: w.id, slug: createUrlSlug(w.name, w.surname) })));
+            return workersCache;
+        }
+
+        async function searchWorker() {
+            try {
+                const searchInput = document.getElementById('searchInput');
+                if (!searchInput) {
+                    console.warn('Arama kutusu bulunamadı');
+                    return;
+                }
+                const query = searchInput.value.trim();
+                if (!query) return;
+
+                const workers = await loadWorkers();
+                const [name, surname] = query.split(' ').map(s => s.trim());
+                const slug = createUrlSlug(name, surname || '');
+                const worker = workers.find(w => createUrlSlug(w.name, w.surname) === slug);
+
+                if (worker) {
+                    window.location.href = `/grave/worker-profile.html?${slug}`;
+                } else {
+                    alert('Çalışan bulunamadı. Lütfen geçerli bir isim girin.');
+                }
+            } catch (error) {
+                console.error('Arama hatası:', error);
+                alert('Arama sırasında bir hata oluştu.');
+            }
+        }
+
+        async function loadWorkerProfile() {
+            try {
+                console.log('loadWorkerProfile başladı');
+                // Header yükleme
+
+
+                // URL'den slug al
+                const urlParams = new URLSearchParams(window.location.search);
+                const urlSlug = Array.from(urlParams.keys())[0];
+                console.log('URL Slug:', urlSlug);
+
+                if (!urlSlug) {
+                    document.getElementById('workerName').innerHTML = '<p>URL parametresi eksik (ör: ?hasankaya).</p>';
+                    return;
+                }
+
+                // workers.json yükle
+                const workers = await loadWorkers();
+                const worker = workers.find(w => createUrlSlug(w.name, w.surname) === urlSlug);
+                console.log('Bulunan çalışan:', worker);
+
+                if (!worker) {
+                    document.getElementById('workerName').innerHTML = `<p>Çalışan bulunamadı (slug: ${urlSlug}). Mevcut slug'lar: ${workers.map(w => createUrlSlug(w.name, w.surname)).join(', ')}</p>`;
+                    return;
+                }
+
+                // Verileri doldur
+                document.title = `${worker.name} ${worker.surname} Profili`;
+                document.getElementById('coverImage').style.backgroundImage = `url('${worker.coverImage || 'https://placehold.co/1920x400?text=Kapak'}')`;
+                document.getElementById('profilePic').style.backgroundImage = `url('${worker.profileImage || 'https://placehold.co/150x150?text=Profil'}')`;
+                document.getElementById('workerName').innerText = `${worker.name} ${worker.surname} | ${worker.category}`;
+                document.getElementById('workerBio').innerHTML = `<p>${worker.bio}</p>`;
+                document.getElementById('tel').innerText = worker.tel || 'Bilinmiyor';
+                document.getElementById('email').innerText = worker.email || 'Bilinmiyor';
+                document.getElementById('addressText').innerText = worker.address || 'Bilinmiyor';
+
+                // Mini harita
+                const [lat, lng] = getCoordinates(worker.locationLink || '');
+                const miniMap = L.map('miniMap').setView([lat, lng], 15);
+                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(miniMap);
+                L.marker([lat, lng]).addTo(miniMap).bindPopup(worker.address || 'Konum');
+
+                // Yol tarifi
+                window.getDirections = () => {
+                    if (worker.locationLink) window.open(worker.locationLink, '_blank');
+                };
+
+                // Slider (örnek çalışmalar)
+                const slider = document.getElementById('workSlider');
+                slider.innerHTML = '';
+                (worker.examples || []).forEach(img => {
+                    const slide = document.createElement('div');
+                    slide.className = 'slide';
+                    slide.innerHTML = `<img src="${img}" alt="Örnek Çalışma">`;
+                    slider.appendChild(slide);
+                });
+
+                // Sürüklenebilir slider
+                let startX, isDragging = false;
+                slider.addEventListener('mousedown', e => { isDragging = true; startX = e.clientX; });
+                slider.addEventListener('mousemove', e => {
+                    if (isDragging) {
+                        const diff = startX - e.clientX;
+                        if (Math.abs(diff) > 50) {
+                            if (diff > 0) slideRight(); else slideLeft();
+                            isDragging = false;
+                        }
+                    }
+                });
+                slider.addEventListener('mouseup', () => isDragging = false);
+                slider.addEventListener('touchstart', e => { isDragging = true; startX = e.touches[0].clientX; });
+                slider.addEventListener('touchmove', e => {
+                    if (isDragging) {
+                        const diff = startX - e.touches[0].clientX;
+                        if (Math.abs(diff) > 50) {
+                            if (diff > 0) slideRight(); else slideLeft();
+                            isDragging = false;
+                        }
+                    }
+                });
+                slider.addEventListener('touchend', () => isDragging = false);
+
+                // Sosyal medya ikonları - info-row altında
+                const socialIcons = document.getElementById('socialIcons');
+                socialIcons.innerHTML = '<div class="sm"></div>';
+                const smContainer = socialIcons.querySelector('.sm');
+                if (worker.socialLinks) {
+                    // WhatsApp
+                    if (worker.socialLinks.whatsapp) {
+                        smContainer.innerHTML += `<a href="${worker.socialLinks.whatsapp}" title="WhatsApp" class="link wa" target="_blank"><span class="iconify" data-icon="akar-icons:whatsapp-fill"></span></a>`;
+                    }
+                    // Instagram
+                    if (worker.socialLinks.instagram) {
+                        smContainer.innerHTML += `<a href="${worker.socialLinks.instagram}" title="Instagram" class="link ig" target="_blank"><span class="iconify" data-icon="akar-icons:instagram-fill"></span></a>`;
+                    }
+                    // Facebook
+                    if (worker.socialLinks.facebook) {
+                        smContainer.innerHTML += `<a href="${worker.socialLinks.facebook}" title="Facebook" class="link fb" target="_blank"><span class="iconify" data-icon="akar-icons:facebook-fill"></span></a>`;
+                    }
+                    // Website
+                    if (worker.socialLinks.website) {
+                        smContainer.innerHTML += `<a href="${worker.socialLinks.website}" title="Website" class="link website" target="_blank"><span class="iconify" data-icon="akar-icons:globe"></span></a>`;
+                    }
+                    // Twitter
+                    if (worker.socialLinks.twitter) {
+                        smContainer.innerHTML += `<a href="${worker.socialLinks.twitter}" title="Twitter" class="link tweet" target="_blank"><span class="iconify" data-icon="akar-icons:twitter-fill"></span></a>`;
+                    }
+                    // LinkedIn
+                    if (worker.socialLinks.linkedin) {
+                        smContainer.innerHTML += `<a href="${worker.socialLinks.linkedin}" title="LinkedIn" class="link linkedin" target="_blank"><span class="iconify" data-icon="akar-icons:linkedin-fill"></span></a>`;
+                    }
+                    // TikTok 
+                    if (worker.socialLinks.tiktok) {
+                        smContainer.innerHTML += `<a href="${worker.socialLinks.tiktok}" title="TikTok" class="link tiktok" target="_blank"><span class="iconify" data-icon="akar-icons:tiktok-fill"></span></a>`;
+                    }
+                } else {
+                    socialIcons.innerHTML = '<p style="color: #999; font-style: italic;">Sosyal medya bilgileri mevcut değil.</p>';
+                }
+
+                // Paketler
+                const packages = document.getElementById('packages');
+                packages.innerHTML = '';
+                (worker.packages || []).forEach(pkg => {
+                    const card = document.createElement('div');
+                    card.className = 'package-card';
+                    card.innerHTML = `
+                        <p class="old-price">${pkg.oldPrice}</p>
+                        <p class="new-price">${pkg.newPrice}</p>
+                        <div class="divider" style="background: ${pkg.gradient};"></div>
+                        <p class="campaign-msg">${pkg.msg}</p>
+                    `;
+                    packages.appendChild(card);
+                });
+
+                console.log('Profil yüklendi:', worker.name);
+            } catch (error) {
+                console.error('Profil yükleme hatası:', error);
+                document.getElementById('workerName').innerHTML = `<p>Hata: ${error.message}</p>`;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadWorkerProfile);
+    </script>
+</body>
+
+</html>

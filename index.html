@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Projelerim</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      width: 100vw;
+      background: #f1f1f1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .slider-container {
+      height: 100vh;
+      width: 100vw;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      user-select: none;
+      position: relative;
+      margin-top: 0;
+    }
+
+    .slider-title {
+      position: absolute;
+      top: 20px;
+      font-family: 'Arial', sans-serif;
+      font-size: 24px;
+      color: #333;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .left-arrow,
+    .right-arrow {
+      height: 100%;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      z-index: 5;
+    }
+
+    .slider-content {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: row;
+      overflow: hidden;
+      position: relative;
+      perspective: 100px;
+      user-select: none;
+      /* Ekle */
+    }
+
+    .slider-content-background {
+      height: 100%;
+      width: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: linear-gradient(to left,
+          #f1f1f1,
+          transparent,
+          transparent,
+          transparent,
+          #f1f1f1);
+      z-index: 3;
+    }
+
+    .slider-content .slide {
+      position: absolute;
+      left: 50%;
+      height: 90vh;
+      max-height: 90vh;
+      width: 39vw;
+      min-width: 250px;
+      border-radius: 25px;
+      z-index: 0;
+      transform: translate(-50%, 0) rotateY(0deg) scale(1, 1);
+      transform-style: preserve-3d;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.8s ease-in-out, opacity 0.8s ease-in-out, left 0.8s ease-in-out, z-index 0s 0.4s ease-in-out, box-shadow 0.8s ease-in-out, filter 0.8s ease-in-out;
+      box-shadow: 0px 0.4rem 1.6rem rgba(0, 0, 0, 0.1);
+      cursor: pointer;
+      overflow: hidden;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    .slide.bot {
+      background: linear-gradient(to right, #007bff, #28a745 70%);
+    }
+
+    .slide.genzmoda {
+      background: linear-gradient(to right, #28a745, #6f42c1 70%);
+    }
+
+    .slide.grave {
+      background: linear-gradient(to right, #6f42c1, #007bff 70%);
+    }
+
+    .slide.position-1 {
+      left: 15% !important;
+      z-index: 1 !important;
+      transform: translate(-50%, 0) rotateY(-2deg) scale(0.8, 0.8) !important;
+      opacity: 0.6 !important;
+      box-shadow: 0px 0.4rem 1.6rem rgba(0, 0, 0, 0.1) !important;
+      filter: brightness(0.6);
+    }
+
+    .slide.position-2 {
+      left: 30% !important;
+      z-index: 2 !important;
+      transform: translate(-50%, 0) rotateY(-1deg) scale(0.9, 0.9) !important;
+      opacity: 0.8 !important;
+      box-shadow: 0px 0.4rem 1.6rem rgba(0, 0, 0, 0.3) !important;
+      filter: brightness(0.8);
+    }
+
+    .slide.position-3 {
+      left: 50% !important;
+      z-index: 4 !important;
+      transform: translate(-50%, 0) rotateY(0deg) scale(1, 1) !important;
+      opacity: 1 !important;
+      box-shadow: 0px 0.4rem 1.6rem rgba(0, 0, 0, 0.5) !important;
+      filter: brightness(1);
+      pointer-events: auto;
+      /* Tıklama için merkez kartı aktif et */
+    }
+
+    .slide.position-3:hover {
+      box-shadow: 0px 0rem 1.8rem rgba(0, 0, 0, 0.7) !important;
+      transform: translate(-50%, 0) rotateY(0deg) scale(1.05, 1.05) !important;
+    }
+
+    .slide.position-4 {
+      left: 70% !important;
+      z-index: 2 !important;
+      transform: translate(-50%, 0) rotateY(1deg) scale(0.9, 0.9) !important;
+      opacity: 0.8 !important;
+      box-shadow: 0px 0.4rem 1.6rem rgba(0, 0, 0, 0.3) !important;
+      filter: brightness(0.8);
+    }
+
+    .slide.position-5 {
+      left: 85% !important;
+      z-index: 1 !important;
+      transform: translate(-50%, 0) rotateY(2deg) scale(0.8, 0.8) !important;
+      opacity: 0.6 !important;
+      box-shadow: 0px 0.4rem 1.6rem rgba(0, 0, 0, 0.1) !important;
+      filter: brightness(0.6);
+    }
+
+    .slide.position-none {
+      left: 50%;
+      z-index: 0;
+      transform: translate(-50%, 0) rotateY(0deg) scale(0.7, 0.7);
+      opacity: 0.4;
+      box-shadow: 0px 0.4rem 1.6rem rgba(0, 0, 0, 0);
+    }
+
+    .slider-container i {
+      width: 2rem;
+      height: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      border-radius: 50%;
+      color: #333;
+    }
+
+    .slider-container .left-arrow:hover i,
+    .slider-container .right-arrow:hover i {
+      background: rgba(0, 123, 255, 0.1);
+      color: #007bff;
+    }
+
+    .media,
+    .card-sections {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 25px;
+      overflow: hidden;
+    }
+
+    .media {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .media img {
+      max-width: 80%;
+      height: auto;
+      z-index: 1;
+      object-fit: contain;
+      user-select: none;
+      /* Ekle */
+      pointer-events: none;
+      /* Ekle */
+    }
+
+    .card-sections {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      box-sizing: border-box;
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.7), transparent);
+      align-items: center;
+    }
+
+    .card-sections h2 {
+      margin-bottom: 15px;
+      font-size: 1.8rem;
+      color: #fff;
+      z-index: 1;
+    }
+
+    .card-sections button {
+      background: transparent;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
+      transition: all 0.5s ease-in-out;
+      z-index: 1;
+    }
+
+    .card-sections button:hover {
+      background: rgba(255, 255, 255, 0.8);
+      color: #333;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(rgba(129, 59, 151, 0.5),
+          rgba(70, 60, 150, 0.5));
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 99999;
+    }
+
+    .line {
+      position: relative;
+      width: 300px;
+      height: 3px;
+      background: rgba(255, 255, 255, .1);
+      overflow: hidden;
+    }
+
+    .line::before {
+      animation: progress1 4s forwards;
+      /* "infinite" yerine "forwards" */
+      transform-origin: 0 0;
+      content: "";
+      display: block;
+      width: 300px;
+      height: 100%;
+      background: linear-gradient(to right, rgba(255, 255, 255, 0.1) 10%, rgba(255, 255, 255, 0.4) 80%, rgba(255, 255, 255, 1));
+    }
+
+    .line::after {
+      content: "";
+      position: absolute;
+      animation: progress2 4s forwards;
+      /* "infinite" yerine "forwards" */
+      transform-origin: 90% 50%;
+      margin-left: -24px;
+      top: -9px;
+      width: 30px;
+      height: 21px;
+      border-radius: 2px;
+      background: rgba(210, 189, 255, .55);
+      filter: blur(8px);
+      box-shadow: 0 0 10px 6px rgba(210, 189, 255, .4),
+        -20px 0 15px 4px rgba(210, 189, 255, .3),
+        -40px 0 15px 2px rgba(210, 189, 255, .2),
+        -60px 0 10px 1px rgba(210, 189, 255, .1),
+        -80px 0 10px 1px rgba(210, 189, 255, .05);
+    }
+
+    @keyframes progress1 {
+      0% {
+        transform: scalex(0);
+        opacity: .5;
+      }
+
+      90% {
+        transform: scalex(1);
+        opacity: 1;
+      }
+
+      92% {
+        transform: scalex(1);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scalex(1);
+        opacity: 0;
+      }
+    }
+
+    @keyframes progress2 {
+      0% {
+        transform: scale(.3, .8) translatez(0);
+        opacity: 0;
+      }
+
+      90% {
+        transform: scale(1, 1) translatex(300px) translatez(0);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1, 1) translatex(300px) translatez(0);
+        opacity: 0;
+      }
+    }
+
+    @media screen and (max-width: 620px) {
+
+      .slide.position-1,
+      .slide.position-5 {
+        opacity: 0.5 !important;
+      }
+
+      .slide.position-2,
+      .slide.position-4 {
+        opacity: 0.95 !important;
+      }
+
+      .slide {
+        width: 40vw;
+        height: 70vh;
+      }
+
+      .media img {
+        max-width: 85%;
+      }
+
+      .right-arrow,
+      .left-arrow {
+        display: none;
+      }
+
+      .slider-content .slide {
+        height: 55%;
+        max-height: 90vh;
+        width: 6%;
+        min-width: 60%;
+      }
+    }
+
+    @media screen and (max-width: 445px) {
+
+      .slide.position-1,
+      .slide.position-5 {
+        opacity: 0 !important;
+      }
+
+      .slide.position-2,
+      .slide.position-4 {
+        opacity: 0.5 !important;
+      }
+
+      .slide {
+        width: 60vw;
+        height: 60vh;
+      }
+
+      .media img {
+        max-width: 90%;
+      }
+
+      .right-arrow,
+      .left-arrow {
+        display: none;
+      }
+
+      .slider-content .slide {
+        height: 55%;
+        max-height: 90vh;
+        width: 6%;
+        min-width: 60%;
+      }
+    }
+
+    @media screen and (max-width: 415px) {
+      .slide {
+        opacity: 0 !important;
+        box-shadow: none !important;
+      }
+
+      .slide.position-3 {
+        box-shadow: none !important;
+        opacity: 1 !important;
+        width: 80vw;
+        height: 80vh;
+      }
+
+      .slide.position-1,
+      .slide.position-2 {
+        left: -50% !important;
+        transform: translate(-50%, 0) rotateY(0deg) scale(0.7, 0.7) !important;
+      }
+
+      .slide.position-4,
+      .slide.position-5 {
+        left: 150% !important;
+        transform: translate(-50%, 0) rotateY(0deg) scale(0.7, 0.7) !important;
+      }
+
+      .media img {
+        max-width: 95%;
+      }
+
+      .right-arrow,
+      .left-arrow {
+        display: none;
+      }
+
+      .slider-content .slide {
+        height: 55%;
+        max-height: 90vh;
+        width: 6%;
+        min-width: 60%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="loading-overlay" id="loading">
+    <div class="line"></div>
+  </div>
+
+  <div class="container">
+    <div class="slider-container">
+      <h4 class="slider-title">Projelerim</h4>
+      <div class="left-arrow"><i class="fa fa-angle-left" style="font-size:24px"></i></div>
+      <div class="slider-content" id="slider-content">
+        <div class="slide bot" data-href="bot/">
+          <div class="media">
+            <img src="bot.png" alt="Bot Projesi">
+          </div>
+          <div class="card-sections">
+
+            <div class="lower-section">
+              <h2>Bot</h2>
+              <button>Projeye Git</button>
+            </div>
+          </div>
+        </div>
+        <div class="slide genzmoda" data-href="genzmoda/">
+          <div class="media">
+            <img src="genzmoda.png" alt="Genzmoda Projesi">
+          </div>
+          <div class="card-sections">
+
+            <div class="lower-section">
+              <h2>Genzmoda</h2>
+              <button>Projeye Git</button>
+            </div>
+          </div>
+        </div>
+        <div class="slide grave" data-href="grave/">
+          <div class="media">
+            <img src="grave.png" alt="Grave Projesi">
+          </div>
+          <div class="card-sections">
+
+            <div class="lower-section">
+              <h2>Grave</h2>
+              <button>Projeye Git</button>
+            </div>
+          </div>
+        </div>
+        <div class="slider-content-background"></div>
+      </div>
+      <div class="right-arrow"><i class="fa fa-angle-right" style="font-size:24px"></i></div>
+    </div>
+  </div>
+
+  <script>
+    // Sayfanın ilk yüklenmesi
+    window.addEventListener("load", () => {
+      const loading = document.getElementById("loading");
+      loading.style.display = "flex"; // İlk yüklemede göster
+      setTimeout(() => {
+        loading.style.display = "none"; // 2 saniye sonra gizle
+      }, 2000);
+    });
+
+    // Sayfaya geri dönüldüğünde veya önbellekten yüklendiğinde
+    window.addEventListener("pageshow", (event) => {
+      const loading = document.getElementById("loading");
+      if (event.persisted) {
+        loading.style.display = "flex"; // Geri dönüldüğünde göster
+        // Animasyonu sıfırlamak için line öğesini yeniden yükle
+        const line = loading.querySelector(".line");
+        line.style.animation = "none";
+        setTimeout(() => {
+          line.style.animation = ""; // Animasyonu sıfırla
+          loading.style.display = "flex"; // Göster
+          setTimeout(() => {
+            loading.style.display = "none"; // 2 saniye sonra gizle
+          }, 2000);
+        }, 10); // Küçük bir gecikme ile animasyonu sıfırla
+      }
+    });
+
+    var sliders = document.querySelectorAll(".slide");
+    var center = Math.floor(sliders.length / 2);
+    var leftMid = center - 1 >= 0 ? center - 1 : sliders.length - 1;
+    var rightMid = center + 1 < sliders.length ? center + 1 : 0;
+    let isDragging = false;
+    let startX;
+
+    sliders.forEach((slide, index) => {
+      slide.classList.add("position-none");
+      if (index === leftMid) slide.classList.add("position-2");
+      if (index === center) slide.classList.add("position-3");
+      if (index === rightMid) slide.classList.add("position-4");
+    });
+
+    function leftScroll() {
+      sliders.forEach(slide => {
+        slide.classList.remove("position-2", "position-3", "position-4", "position-none");
+      });
+
+      center = center - 1 < 0 ? sliders.length - 1 : center - 1;
+      leftMid = leftMid - 1 < 0 ? sliders.length - 1 : leftMid - 1;
+      rightMid = rightMid - 1 < 0 ? sliders.length - 1 : rightMid - 1;
+
+      sliders.forEach((slide, index) => {
+        slide.classList.add("position-none");
+        if (index === leftMid) slide.classList.add("position-2");
+        if (index === center) slide.classList.add("position-3");
+        if (index === rightMid) slide.classList.add("position-4");
+      });
+    }
+
+    function rightScroll() {
+      sliders.forEach(slide => {
+        slide.classList.remove("position-2", "position-3", "position-4", "position-none");
+      });
+
+      center = center + 1 >= sliders.length ? 0 : center + 1;
+      leftMid = leftMid + 1 >= sliders.length ? 0 : leftMid + 1;
+      rightMid = rightMid + 1 >= sliders.length ? 0 : rightMid + 1;
+
+      sliders.forEach((slide, index) => {
+        slide.classList.add("position-none");
+        if (index === leftMid) slide.classList.add("position-2");
+        if (index === center) slide.classList.add("position-3");
+        if (index === rightMid) slide.classList.add("position-4");
+      });
+    }
+
+    const sliderContent = document.getElementById('slider-content');
+
+    // Fare ile sürükleme
+    sliderContent.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX;
+      sliderContent.style.cursor = 'grabbing';
+    });
+
+    sliderContent.addEventListener('mouseup', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      sliderContent.style.cursor = 'grab';
+      const endX = e.clientX;
+      const diff = endX - startX;
+      if (Math.abs(diff) > 50) { // Eşik değeri
+        if (diff > 0) {
+          leftScroll(); // Sola sürükleme -> sola kaydır
+        } else {
+          rightScroll(); // Sağa sürükleme -> sağa kaydır
+        }
+      }
+    });
+
+    sliderContent.addEventListener('mouseleave', () => {
+      isDragging = false;
+      sliderContent.style.cursor = 'grab';
+    });
+
+    // Dokunmatik cihazlar için sürükleme
+    class Swipe {
+      constructor(element) {
+        this.xDown = null;
+        this.yDown = null;
+        this.element = typeof (element) === 'string' ? document.querySelector(element) : element;
+
+        this.element.addEventListener('touchstart', (evt) => {
+          this.xDown = evt.touches[0].clientX;
+          this.yDown = evt.touches[0].clientY;
+        }, false);
+      }
+
+      onLeft(callback) {
+        this.onLeft = callback;
+        return this;
+      }
+
+      onRight(callback) {
+        this.onRight = callback;
+        return this;
+      }
+
+      handleTouchMove(evt) {
+        if (!this.xDown || !this.yDown) return;
+
+        var xUp = evt.touches[0].clientX;
+        var yUp = evt.touches[0].clientY;
+
+        this.xDiff = this.xDown - xUp;
+        this.yDiff = this.yDown - yUp;
+
+        if (Math.abs(this.xDiff) > Math.abs(this.yDiff)) {
+          if (this.xDiff > 50) {
+            this.onLeft(); // Sola sürükleme -> sola kaydır
+          } else if (this.xDiff < -50) {
+            this.onRight(); // Sağa sürükleme -> sağa kaydır
+          }
+        }
+
+        this.xDown = null;
+        this.yDown = null;
+      }
+
+      run() {
+        this.element.addEventListener('touchmove', (evt) => {
+          this.handleTouchMove(evt);
+        }, false);
+      }
+    }
+
+    var swiper = new Swipe(sliderContent);
+    swiper.onLeft(leftScroll);
+    swiper.onRight(rightScroll);
+    swiper.run();
+
+    // Oklara tıklama
+    $(".left-arrow").on("click", leftScroll);
+    $(".right-arrow").on("click", rightScroll);
+
+    // Kartlara tıklama
+    document.querySelectorAll(".slide").forEach(slide => {
+      slide.addEventListener("click", e => {
+        e.preventDefault();
+        if (slide.classList.contains("position-3")) {
+          const href = slide.getAttribute("data-href");
+          const loading = document.getElementById("loading");
+          loading.style.display = "flex";
+          setTimeout(() => {
+            window.location.href = href;
+          }, 2000);
+        }
+      });
+    });
+    
+  </script>
+</body>
+
+</html>
