@@ -28,9 +28,11 @@
             opacity: 0;
             pointer-events: none;
         }
+
         .leaflet-control-container {
-  z-index: 1 !important; /* overlay’in altında kalsın */
-}
+            z-index: 1 !important;
+            /* overlay’in altında kalsın */
+        }
 
         /* Intro animasyon stilleri */
         #year {
@@ -112,17 +114,6 @@
 
 
 
-        .slider:not(.zoom) .item.item1 {
-            transform: rotateY(0deg) translateZ(0);
-        }
-
-        .slider:not(.zoom) .item.item2 {
-            transform: rotateY(120deg) translateZ(0);
-        }
-
-        .slider:not(.zoom) .item.item3 {
-            transform: rotateY(240deg) translateZ(0);
-        }
 
         .slider.zoom .item {
             transition: all 900ms ease-in-out, opacity 300ms linear 500ms;
@@ -158,33 +149,6 @@
             will-change: transform;
         }
 
-        .item.item1 {
-            transform: rotateY(0deg) translateZ(500px);
-            background-position: 50% 0%;
-        }
-
-        .item.item1.active {
-            transform: rotateY(0deg) translateZ(250px);
-            opacity: 1;
-        }
-
-        .item.item2 {
-            transform: rotateY(120deg) translateZ(500px);
-        }
-
-        .item.item2.active {
-            transform: rotateY(120deg) translateZ(250px);
-            opacity: 1;
-        }
-
-        .item.item3 {
-            transform: rotateY(240deg) translateZ(500px);
-        }
-
-        .item.item3.active {
-            transform: rotateY(240deg) translateZ(250px);
-            opacity: 1;
-        }
 
         .item__info {
             text-align: center;
@@ -628,6 +592,165 @@
             transform: scale(1.05);
             background: #fbfb00;
         }
+        /* FADE + ZOOM SLIDER İÇİN GÜNCELLEMELER */
+
+/* Slider kapsayıcısına 3D perspektif ekle */
+.slider-container {
+    perspective: 1000px;
+    perspective-origin: center center;
+}
+
+/* Wrapper için 3D koruma */
+.wrapper {
+    transform-style: preserve-3d;
+}
+
+/* Item'lar için fade ve zoom efektleri */
+.item {
+    /* Mevcut stiller korunuyor */
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    
+    /* FADE EFEKTİ */
+    opacity: 0;
+    visibility: hidden;
+    transition: all 900ms ease-in-out;
+    transform: scale(0.8) translateZ(0);
+    
+    /* Mevcut diğer stiller... */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background-repeat: no-repeat;
+    background-size: cover !important;
+    background-position: center;
+    pointer-events: none;
+    will-change: transform, opacity;
+}
+
+/* Aktif item */
+.item.active {
+    opacity: 1;
+    visibility: visible;
+    transform: scale(1) translateZ(0);
+    pointer-events: all;
+    z-index: 10;
+}
+
+/* Zoom efekti sırasında */
+.slider.zoom .item {
+    transition: all 900ms ease-in-out, opacity 300ms linear 500ms;
+}
+
+.slider.zoom .item:not(.active) {
+    opacity: 0.3;
+    transform: scale(0.9);
+}
+
+.slider.zoom .item.active {
+    opacity: 1;
+    transform: scale(1.1);
+    z-index: 20;
+}
+
+/* Item info için düzeltme */
+.item__info {
+    /* Mevcut stiller korunuyor */
+    text-align: center;
+    text-transform: uppercase;
+    font-weight: bold;
+    will-change: transform;
+    
+    /* Fade sırasında sabit kalması için */
+    position: relative;
+    z-index: 5;
+}
+
+/* Span animasyonları - mevcut CSS korunuyor */
+.item__year span,
+.item__name span {
+    /* Mevcut animasyonlar korunuyor */
+    transition: all 900ms ease-in-out;
+    transform: scale(0.7);
+}
+
+.item.active .item__year span,
+.item.active .item__name span {
+    transform: scale(1);
+}
+
+/* Button animasyonu */
+.btn {
+    /* Mevcut stiller korunuyor */
+    transform: scale(0.7);
+    transition: all 400ms ease-in-out;
+}
+
+.item.active .btn {
+    transform: scale(1);
+}
+
+/* Oklar için z-index */
+.arrow {
+    /* Mevcut stiller korunuyor */
+    z-index: 100; /* Slider'ın üstünde */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .item__name {
+        font-size: 30px;
+        line-height: 30px;
+    }
+    
+    .item__year {
+        font-size: 20px;
+        line-height: 20px;
+    }
+    
+    .slider.zoom .item.active {
+        transform: scale(1.05); /* Mobilde daha az zoom */
+    }
+}
+/* DRAGABLE İÇİN GEREKLİ STİLLER */
+.slider {
+    /* Mevcut stillere ekle */
+    touch-action: pan-y; /* Yatay sürükleme için */
+    user-select: none; /* Metin seçimi engelle */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* Sürükleme sırasında hafif kaydırma efekti */
+.slider:active,
+.slider.dragging {
+    cursor: grabbing !important;
+    transition: none !important; /* Anlık tepki için */
+}
+
+/* Zoom efekti sırasında cursor */
+.slider.zoom {
+    cursor: grab;
+}
+
+.slider.zoom:active {
+    cursor: grabbing;
+}
+
+/* Mobilde daha hassas dokunma */
+@media (max-width: 768px) {
+    .slider {
+        touch-action: pan-y pinch-zoom; /* Zoom da çalışsın */
+    }
+    
+    /* Mobilde drag threshold'u küçült */
+    /* JavaScript'te dragThreshold = 30; yapabilirsiniz */
+}
     </style>
 
 
@@ -643,7 +766,7 @@
 
     <div id="header-container"></div>
     <!-- Slider Bölümü -->
-    <div class="row" >
+    <div class="row">
         <div class="col-12" style="padding: 0 !important;">
             <div class="slider-container">
                 <div class="slider">
@@ -692,23 +815,23 @@
         </div>
     </div>
 
-        <!-- Çalışanlar Sekmesi -->
-        <div class="row workers-row" style="display:none;">
-            <div class="container-workers">
-                <!-- Sol Panel -->
-                <div class="sidebar">
-                    <input type="text" id="sidebarSearch" placeholder="Kategorilerde ara...">
-                    <div id="filterList"></div>
-                </div>
-                <!-- Sağ Panel -->
-                <div class="content">
-                    <input type="text" id="contentSearch" placeholder="Kartlarda ara...">
-                    <div class="grid" id="workerGrid"></div>
-                </div>
+    <!-- Çalışanlar Sekmesi -->
+    <div class="row workers-row" style="display:none;">
+        <div class="container-workers">
+            <!-- Sol Panel -->
+            <div class="sidebar">
+                <input type="text" id="sidebarSearch" placeholder="Kategorilerde ara...">
+                <div id="filterList"></div>
+            </div>
+            <!-- Sağ Panel -->
+            <div class="content">
+                <input type="text" id="contentSearch" placeholder="Kartlarda ara...">
+                <div class="grid" id="workerGrid"></div>
             </div>
         </div>
+    </div>
 
-        
+
     <div class="row">
         <div class="col-md-12">
             <div id="details" class="details"></div>
@@ -725,61 +848,61 @@
 
     <script>
 
-document.addEventListener("DOMContentLoaded", async () => {
-    // Header'ı yükle (her sayfada bir kez)
-    const headerContainer = document.getElementById('header-container');
-    if (headerContainer) {
-        try {
-            const headerResponse = await fetch('/grave/header.html');
-            if (headerResponse.ok) {
-                headerContainer.innerHTML = await headerResponse.text();
-                console.log('Header yüklendi');
-            } else {
-                console.warn('Header yüklenemedi:', headerResponse.status);
+        document.addEventListener("DOMContentLoaded", async () => {
+            // Header'ı yükle (her sayfada bir kez)
+            const headerContainer = document.getElementById('header-container');
+            if (headerContainer) {
+                try {
+                    const headerResponse = await fetch('/grave/header.html');
+                    if (headerResponse.ok) {
+                        headerContainer.innerHTML = await headerResponse.text();
+                        console.log('Header yüklendi');
+                    } else {
+                        console.warn('Header yüklenemedi:', headerResponse.status);
+                    }
+                } catch (error) {
+                    console.error('Header yükleme hatası:', error);
+                }
             }
-        } catch (error) {
-            console.error('Header yükleme hatası:', error);
-        }
-    }
 
-    // Header olaylarını bağla (arama kutusu, ana sayfa, profil)
-    const searchInput = document.querySelector('.header-search');
-    if (searchInput) {
-        searchInput.addEventListener('input', (e) => {
-            searchPersons(e.target.value, window.persons || [], window.workers || []);
-        });
-        searchInput.addEventListener('blur', () => {
-            setTimeout(() => {
-                const searchResults = document.getElementById('search-results');
-                if (searchResults) searchResults.classList.remove('show');
-            }, 200);
-        });
-    }
+            // Header olaylarını bağla (arama kutusu, ana sayfa, profil)
+            const searchInput = document.querySelector('.header-search');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    searchPersons(e.target.value, window.persons || [], window.workers || []);
+                });
+                searchInput.addEventListener('blur', () => {
+                    setTimeout(() => {
+                        const searchResults = document.getElementById('search-results');
+                        if (searchResults) searchResults.classList.remove('show');
+                    }, 200);
+                });
+            }
 
-    const homeLink = document.querySelector('.header-home');
-    if (homeLink) {
-        homeLink.addEventListener('click', (e) => {
-            e.preventDefault();
-            window.location.href = '/grave/index.html';
-        });
-    }
+            const homeLink = document.querySelector('.header-home');
+            if (homeLink) {
+                homeLink.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.location.href = '/grave/index.html';
+                });
+            }
 
-    const profileImg = document.querySelector('.header-profile img');
-    if (profileImg) {
-        profileImg.addEventListener('click', () => {
-            window.location.href = '/grave/profile.html';
-        });
-    }
+            const profileImg = document.querySelector('.header-profile img');
+            if (profileImg) {
+                profileImg.addEventListener('click', () => {
+                    window.location.href = '/grave/profile.html';
+                });
+            }
 
-    // Sayfa'ya özgü fonksiyonu çağır (header sonrası)
-    if (window.location.pathname.includes('profile.html')) {
-        loadProfileData();
-    } else if (window.location.pathname.includes('worker-profile.html')) {
-        loadWorkerProfile();
-    } else {
-        loadDataAndHeader(); // Veri yükleme, header hariç
-    }
-});
+            // Sayfa'ya özgü fonksiyonu çağır (header sonrası)
+            if (window.location.pathname.includes('profile.html')) {
+                loadProfileData();
+            } else if (window.location.pathname.includes('worker-profile.html')) {
+                loadWorkerProfile();
+            } else {
+                loadDataAndHeader(); // Veri yükleme, header hariç
+            }
+        });
 
 
         // Intro animasyon verileri
@@ -906,29 +1029,29 @@ document.addEventListener("DOMContentLoaded", async () => {
         const allImages = leaders.map(l => l.img).concat(lastImages.map(l => l.img));
 
         // Eğer animasyon daha önce gösterilmediyse çalıştır
-if (!localStorage.getItem("introPlayed")) {
-    // Scroll kapat
-    document.body.style.overflow = 'hidden';
+        if (!localStorage.getItem("introPlayed")) {
+            // Scroll kapat
+            document.body.style.overflow = 'hidden';
 
-    Promise.all(allImages.map(src => new Promise(resolve => {
-        const img = new Image();
-        img.src = src;
-        img.onload = img.onerror = resolve;
-    }))).then(() => {
-        changeBackground(getRandomLeaderImage());
-        animateYears().then(() => {
-            console.log("Intro animasyonu tamamlandı!");
-            localStorage.setItem("introPlayed", "true");
+            Promise.all(allImages.map(src => new Promise(resolve => {
+                const img = new Image();
+                img.src = src;
+                img.onload = img.onerror = resolve;
+            }))).then(() => {
+                changeBackground(getRandomLeaderImage());
+                animateYears().then(() => {
+                    console.log("Intro animasyonu tamamlandı!");
+                    localStorage.setItem("introPlayed", "true");
 
-            // Scroll tekrar aç
-            document.body.style.overflow = '';
-        });
-    });
-} else {
-    introOverlay.style.display = "none";
-    document.querySelector('.container').classList.add('show');
-    document.querySelector('#header-container').classList.add('show');
-}
+                    // Scroll tekrar aç
+                    document.body.style.overflow = '';
+                });
+            });
+        } else {
+            introOverlay.style.display = "none";
+            document.querySelector('.container').classList.add('show');
+            document.querySelector('#header-container').classList.add('show');
+        }
 
 
         //----------------------------------------------------------------------------------------------------------//
@@ -984,91 +1107,247 @@ if (!localStorage.getItem("introPlayed")) {
             p.urlSlug = createUrlSlug(p.name, p.surname);
         });
 
-        // Slider'ı dinamik olarak doldur
-        const sliderWrapper = document.getElementById('slider-wrapper');
-        persons.forEach((person, index) => {
-            const item = document.createElement('div');
-            item.className = `item item${index + 1} ${index === 0 ? 'active' : ''}`;
-            item.style.backgroundImage = `url('${person.coverImage || 'https://via.placeholder.com/800x600'}')`;
+      // Slider'ı dinamik olarak doldur
+const sliderWrapper = document.getElementById('slider-wrapper');
 
-            // Artık slug doğrudan kullanılacak
-            item.innerHTML = `
+// Önce item sayısını hesapla
+const itemCount = persons.length;
+console.log(`🔢 Toplam item: ${itemCount}`);
+
+// Her item için wrapper oluştur
+persons.forEach((person, index) => {
+    const item = document.createElement('div');
+    item.className = `item ${index === 0 ? 'active' : ''}`;
+    item.style.backgroundImage = `url('${person.coverImage || 'https://via.placeholder.com/800x600'}')`;
+    
+    item.innerHTML = `
         <div class="item__info">
             <p class="item__year"><span>${person.birthDeath || 'Bilinmiyor'}</span></p>
             <p class="item__name"><span>${person.name} ${person.surname}</span></p>
             <a href="/grave/profile.html?${person.urlSlug}" class="btn"><span>Profile Git</span></a>
         </div>
     `;
-            sliderWrapper.appendChild(item);
-        });
-
-        // === Slider JavaScript (sonsuz döngü için güvenli versiyon) ===
-        let slider = document.querySelector('.slider');
-        let wrapper = document.querySelector('.wrapper');
-        let next = document.querySelector('.arrow-next');
-        let prev = document.querySelector('.arrow-prev');
-
-        // items'ı persons eklendikten sonra alıyoruz
-        let items = document.querySelectorAll('.item');
-        let deg = 360 / items.length; // her slide için açı (esnek)
-        let currDeg = 0;
-        let active = 0;
-        let isAnimating = false;
-        let autoPlayInterval;
-
-        // Eğer CSS'de transition yoksa burada garantiye alıyoruz
-        if (!wrapper.style.transition) wrapper.style.transition = 'transform 0.9s ease';
-
-        // Otomatik oynatma fonksiyonu
-        function startAutoPlay() {
-            clearInterval(autoPlayInterval); // Önceki interval'i temizle
-            autoPlayInterval = setInterval(() => {
-                if (!isAnimating) {
-                    next.click(); // next olayını tetikle
-                }
-            }, 5000); // Her 2 saniyede bir
-        }
-
-        // İlk başta otomatik oynatmayı başlat
-        startAutoPlay();
-
-        next.addEventListener('click', () => {
-            if (isAnimating) return; // Animasyon bitene kadar yeni tıklamayı engelle
-            isAnimating = true;
-            slider.classList.add('zoom');
-            currDeg -= deg; // Sürekli azaltarak sonsuz döngü
-            wrapper.style.transform = `rotateY(${currDeg}deg)`;
-            active = (active + 1) % items.length;
-            startAutoPlay(); // Tıklama sonrası otomatik oynatmayı sıfırla
-        });
-
-        prev.addEventListener('click', () => {
-            if (isAnimating) return;
-            isAnimating = true;
-            slider.classList.add('zoom');
-            currDeg += deg;
-            wrapper.style.transform = `rotateY(${currDeg}deg)`;
-            active = (active - 1 + items.length) % items.length;
-            startAutoPlay(); // Tıklama sonrası otomatik oynatmayı sıfırla
-        });
-
-        // Transform bitince active class'ı güncelle, zoom'u kaldır ve tıklamaya izin ver
-        wrapper.addEventListener('transitionend', (e) => {
-            if (e.propertyName !== 'transform') return; // Sadece transform bittiğinde çalış
-            items.forEach(i => i.classList.remove('active'));
-            items[active].classList.add('active');
-            slider.classList.remove('zoom');
-            isAnimating = false;
-        });
-
-        // Eğer dinamik olarak yeni item ekliyorsanız (ör. ajax ile) çağırın:
-        function recomputeSlider() {
-            items = document.querySelectorAll('.item');
-            deg = 360 / items.length;
-            startAutoPlay(); // Yeni item eklenirse otomatik oynatmayı sıfırla
-        }
+    sliderWrapper.appendChild(item);
     
-     const filterItems = document.querySelectorAll(".filter-item");
+    console.log(`Item ${index + 1} eklendi: ${person.name} ${person.surname}`);
+});
+
+// === FADE + ZOOM SLIDER KONTROLLERİ ===
+let slider = document.querySelector('.slider');
+let wrapper = document.querySelector('.wrapper');
+let next = document.querySelector('.arrow-next');
+let prev = document.querySelector('.arrow-prev');
+
+// DOM'dan items'ı al
+let items = document.querySelectorAll('.item');
+let currentIndex = 0; // Mevcut aktif index
+let isAnimating = false;
+let autoPlayInterval;
+
+// DRAGABLE İÇİN DEĞİŞKENLER
+let startX = 0;
+let endX = 0;
+let isDragging = false;
+let dragThreshold = 50; // Minimum sürükleme mesafesi (px)
+
+// Otomatik oynatma - 5 SANİYEDE BİR
+function startAutoPlay() {
+    clearInterval(autoPlayInterval);
+    autoPlayInterval = setInterval(() => {
+        if (!isAnimating && !isDragging) {
+            nextItem();
+        }
+    }, 5000); // 5 saniye
+}
+
+startAutoPlay();
+
+// SONRAKİ SLIDE (Next)
+function nextItem() {
+    if (isAnimating || isDragging) return;
+    
+    console.log(`➡️ Next: Item ${currentIndex + 1} → Item ${currentIndex + 2}`);
+    
+    isAnimating = true;
+    slider.classList.add('zoom'); // Zoom efekti
+    
+    // Mevcut item'ı gizle
+    items[currentIndex].classList.remove('active');
+    
+    // Sonraki item'ı aktif yap
+    currentIndex = (currentIndex + 1) % itemCount;
+    items[currentIndex].classList.add('active');
+    
+    // Animasyon bitince temizle
+    setTimeout(() => {
+        slider.classList.remove('zoom');
+        isAnimating = false;
+        startAutoPlay();
+    }, 900); // CSS transition süresi kadar bekle
+    
+    console.log(`✅ Yeni aktif: Item ${currentIndex + 1}`);
+}
+
+// ÖNCEKİ SLIDE (Prev)
+function prevItem() {
+    if (isAnimating || isDragging) return;
+    
+    console.log(`⬅️ Prev: Item ${currentIndex + 1} → Item ${currentIndex}`);
+    
+    isAnimating = true;
+    slider.classList.add('zoom');
+    
+    // Mevcut item'ı gizle
+    items[currentIndex].classList.remove('active');
+    
+    // Önceki item'ı aktif yap
+    currentIndex = (currentIndex - 1 + itemCount) % itemCount;
+    items[currentIndex].classList.add('active');
+    
+    setTimeout(() => {
+        slider.classList.remove('zoom');
+        isAnimating = false;
+        startAutoPlay();
+    }, 900);
+    
+    console.log(`✅ Yeni aktif: Item ${currentIndex + 1}`);
+}
+
+// Next buton event
+next.addEventListener('click', (e) => {
+    e.preventDefault();
+    nextItem();
+});
+
+// Prev buton event  
+prev.addEventListener('click', (e) => {
+    e.preventDefault();
+    prevItem();
+});
+
+// ============= DRAGABLE (MOBİL + DESKTOP) =============
+
+// TOUCH EVENTS (MOBİL)
+slider.addEventListener('touchstart', (e) => {
+    startX = e.changedTouches[0].screenX;
+    isDragging = true;
+    clearInterval(autoPlayInterval); // Sürükleme sırasında autoplay durdur
+    console.log(`🖐️ Touch start: X=${startX}`);
+}, { passive: true });
+
+slider.addEventListener('touchmove', (e) => {
+    if (isDragging) {
+        // Opsiyonel: Anlık görsel feedback (hafif kaydırma efekti)
+        const currentX = e.changedTouches[0].screenX;
+        const deltaX = currentX - startX;
+        const translateX = Math.max(-50, Math.min(50, deltaX)); // Maksimum 50px kaydırma
+        slider.style.transform = `translateX(${translateX}px)`;
+    }
+}, { passive: true });
+
+slider.addEventListener('touchend', (e) => {
+    if (!isDragging) return;
+    
+    endX = e.changedTouches[0].screenX;
+    const deltaX = endX - startX;
+    const absDelta = Math.abs(deltaX);
+    
+    console.log(`🖐️ Touch end: DeltaX=${deltaX}px (threshold: ${dragThreshold}px)`);
+    
+    // Geri normal pozisyona dön
+    slider.style.transform = 'translateX(0)';
+    
+    if (absDelta > dragThreshold) {
+        if (deltaX > 0) {
+            // SAĞA SÜRÜKLEME → ÖNCEKİ SLIDE
+            prevItem();
+        } else {
+            // SOLA SÜRÜKLEME → SONRAKİ SLIDE
+            nextItem();
+        }
+    }
+    
+    isDragging = false;
+    startAutoPlay(); // Sürükleme bitince autoplay devam
+}, { passive: true });
+
+// MOUSE EVENTS (DESKTOP)
+slider.addEventListener('mousedown', (e) => {
+    startX = e.screenX;
+    isDragging = true;
+    clearInterval(autoPlayInterval);
+    console.log(`🖱️ Mouse down: X=${startX}`);
+    
+    // Seçimi engelle
+    e.preventDefault();
+});
+
+slider.addEventListener('mousemove', (e) => {
+    if (isDragging) {
+        const currentX = e.screenX;
+        const deltaX = currentX - startX;
+        const translateX = Math.max(-50, Math.min(50, deltaX));
+        slider.style.transform = `translateX(${translateX}px)`;
+    }
+});
+
+slider.addEventListener('mouseup', (e) => {
+    if (!isDragging) return;
+    
+    endX = e.screenX;
+    const deltaX = endX - startX;
+    const absDelta = Math.abs(deltaX);
+    
+    console.log(`🖱️ Mouse up: DeltaX=${deltaX}px (threshold: ${dragThreshold}px)`);
+    
+    // Geri normal pozisyona dön
+    slider.style.transform = 'translateX(0)';
+    
+    if (absDelta > dragThreshold) {
+        if (deltaX > 0) {
+            // SAĞA SÜRÜKLEME → ÖNCEKİ SLIDE
+            prevItem();
+        } else {
+            // SOLA SÜRÜKLEME → SONRAKİ SLIDE
+            nextItem();
+        }
+    }
+    
+    isDragging = false;
+    startAutoPlay();
+});
+
+slider.addEventListener('mouseleave', () => {
+    if (isDragging) {
+        slider.style.transform = 'translateX(0)';
+        isDragging = false;
+        startAutoPlay();
+    }
+});
+
+// Mouse hover ile duraklat (ekstra)
+slider.addEventListener('mouseenter', () => {
+    clearInterval(autoPlayInterval);
+});
+slider.addEventListener('mouseleave', () => {
+    if (!isDragging) {
+        startAutoPlay();
+    }
+});
+
+// Yeniden hesaplama (item sayısı değişirse)
+function recomputeSlider() {
+    items = document.querySelectorAll('.item');
+    itemCount = items.length;
+    console.log(`🔄 Slider güncellendi: ${itemCount} item`);
+    
+    // Mevcut index'i koru
+    items.forEach((item, index) => {
+        item.classList.toggle('active', index === currentIndex);
+    });
+    startAutoPlay();
+}
+        const filterItems = document.querySelectorAll(".filter-item");
         const workers = document.querySelectorAll(".worker-wrapper");
         const sidebarSearch = document.getElementById("sidebarSearch");
         const contentSearch = document.getElementById("contentSearch");
