@@ -394,204 +394,361 @@
 
 
 
-        .container-workers {
-            display: flex;
-            height: 100vh;
-        }
+       .container-workers {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: row;
+}
 
-        /* Sol panel */
-        .sidebar {
-            width: 25%;
-            padding: 20px;
-            border-right: 1px solid #ddd;
-        }
+/* Sol panel */
+.sidebar {
+    width: 25%;
+    padding: 20px;
+    border-right: 1px solid #ddd;
+    background: #f9f9f9;
+}
 
-        .sidebar input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
+.sidebar input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
 
-        .filter-item {
-            padding: 8px 24px;
-            cursor: pointer;
-            position: relative;
-            transition: background 0.3s;
-            margin-bottom: 8px;
-            border-radius: 5px;
-        }
+.filter-item {
+    padding: 8px 24px;
+    cursor: pointer;
+    position: relative;
+    transition: background 0.3s;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    font-size: 14px;
+}
 
-        .filter-item:hover {
-            background: #eee;
-        }
+.filter-item:hover {
+    background: #eee;
+}
 
-        .filter-item.active {
-            background: #dff0d8;
-        }
+.filter-item.active {
+    background: #dff0d8;
+}
 
-        .filter-item.active::before {
-            content: "✔";
-            position: absolute;
-            left: 8px;
-            color: green;
-            font-weight: bold;
-        }
+.filter-item.active::before {
+    content: "✔";
+    position: absolute;
+    left: 8px;
+    color: green;
+    font-weight: bold;
+}
 
-        /* Sağ panel */
-        .content {
-            width: 75%;
-            padding: 20px;
-        }
+/* Sağ panel */
+.content {
+    width: 75%;
+    padding: 20px;
+}
 
-        .content input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
+.content input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(13vw, 1fr));
-            gap: 2vw;
-            position: relative;
-        }
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+    position: relative;
+}
 
-        /* Worker kartları */
-        .worker-wrapper {
-            background: #fff;
-            border-radius: 40px;
-            box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.2);
-            font-size: 0;
-            opacity: 1;
-            transition: opacity 0.3s ease;
-            position: relative;
-        }
+/* Worker kartları */
+.worker-wrapper {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 2px 5px 2px rgba(0, 0, 0, 0.2);
+    font-size: 0;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
 
-        .worker-wrapper.fade-out {
-            opacity: 0;
-            pointer-events: none;
-            position: absolute;
-        }
+.worker-wrapper.fade-out {
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+}
 
-        .worker-wrapper.fade-in {
-            opacity: 1;
-            pointer-events: auto;
-            position: relative;
-        }
+.worker-wrapper.fade-in {
+    opacity: 1;
+    pointer-events: auto;
+    position: relative;
+}
 
-        .worker-banner canvas {
-            display: block;
-            width: 100%;
-            height: 180px;
-            background-position: center center;
-            background-size: cover;
-            border-radius: 40px 40px 0 0;
-        }
+.worker-banner canvas {
+    display: block;
+    width: 100%;
+    height: 180px;
+    background-position: center center;
+    background-size: cover;
+    border-radius: 20px 20px 0 0;
+}
 
-        .worker-details {
-            display: block;
-            padding: 100px 20px 20px;
-            position: relative;
-        }
+.worker-details {
+    display: block;
+    padding: 80px 20px 20px;
+    position: relative;
+}
 
-        .worker-dp {
-            border-radius: 50%;
-            width: 150px;
-            height: 150px;
-            margin: 0 auto;
-            position: absolute;
-            top: -75px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: 0.3s all ease-in;
-        }
+.worker-dp {
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+    position: absolute;
+    top: -60px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.3s ease-in;
+}
 
-        .worker-dp canvas {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            border: 2px solid #000;
-            background-position: center;
-            background-size: cover;
-        }
+.worker-dp canvas {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid #000;
+    background-position: center;
+    background-size: cover;
+}
 
-        .worker-name {
-            text-align: center;
-            z-index: 5;
-            position: relative;
-            margin-top: 0.5vh;
-        }
+.worker-name {
+    text-align: center;
+    z-index: 5;
+    position: relative;
+    margin-top: 0.5vh;
+}
 
-        .worker-name h2 {
-            font-size: 20px;
-            line-height: 1;
-            color: #2d303a;
-            margin: 0;
-        }
+.worker-name h2 {
+    font-size: 18px;
+    line-height: 1.2;
+    color: #2d303a;
+    margin: 0;
+}
 
-        .worker-name h2 span {
-            display: block;
-            font-size: 13px;
-            margin-top: 1vh;
-            margin-bottom: 2vh;
-            color: #666;
-            font-weight: 400;
-        }
+.worker-name h2 span {
+    display: block;
+    font-size: 12px;
+    margin-top: 1vh;
+    margin-bottom: 2vh;
+    color: #666;
+    font-weight: 400;
+}
 
-        .worker-bio {
-            max-height: 10vh;
-            overflow: hidden;
-        }
+.worker-bio {
+    max-height: 10vh;
+    overflow: hidden;
+}
 
-        .worker-bio p {
-            font-size: 14px;
-            line-height: 20px;
-            color: #666;
-            text-align: left;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
+.worker-bio p {
+    font-size: 13px;
+    line-height: 18px;
+    color: #666;
+    text-align: left;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
 
-        .worker-button {
-            display: block;
-            text-align: center;
-            margin: 20px 0;
-        }
+.worker-button {
+    display: block;
+    text-align: center;
+    margin: 20px 0;
+}
 
-        .worker-button a {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 200px;
-            height: 45px;
-            background: #e8c411;
-            color: #000;
-            margin: 0 auto;
-            border-radius: 40px;
-            font-size: 15px;
-            font-weight: 600;
-            text-decoration: none;
-            transition: 0.3s all ease-in;
-        }
+.worker-button a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 180px;
+    height: 40px;
+    background: #e8c411;
+    color: #000;
+    margin: 0 auto;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.3s all ease-in;
+}
 
-        .worker-dp:hover {
-            transform: scale(1.1);
-        }
+.worker-dp:hover {
+    transform: scale(1.1);
+}
 
-        .worker-button a:hover {
-            transform: scale(1.05);
-            background: #fbfb00;
-        }
+.worker-button a:hover {
+    transform: scale(1.05);
+    background: #fbfb00;
+}
+
+/* Tablet ve küçük ekranlar için */
+@media (max-width: 768px) {
+    .container-workers {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .sidebar {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+        padding: 15px;
+    }
+
+    .sidebar input[type="text"] {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .filter-item {
+        padding: 6px 20px;
+        font-size: 13px;
+        margin-bottom: 6px;
+    }
+
+    .content {
+        width: 100%;
+        padding: 15px;
+    }
+
+    .content input[type="text"] {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .grid {
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 15px;
+    }
+
+    .worker-banner canvas {
+        height: 140px;
+    }
+
+    .worker-details {
+        padding: 70px 15px 15px;
+    }
+
+    .worker-dp {
+        width: 100px;
+        height: 100px;
+        top: -50px;
+    }
+
+    .worker-name h2 {
+        font-size: 16px;
+    }
+
+    .worker-name h2 span {
+        font-size: 11px;
+    }
+
+    .worker-bio p {
+        font-size: 12px;
+        line-height: 16px;
+    }
+
+    .worker-button a {
+        width: 160px;
+        height: 35px;
+        font-size: 13px;
+    }
+}
+
+/* Çok küçük ekranlar için (ör. telefonlar) */
+@media (max-width: 480px) {
+    .container-workers {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .sidebar {
+        padding: 10px;
+    }
+
+    .sidebar input[type="text"] {
+        padding: 6px;
+        font-size: 13px;
+    }
+
+    .filter-item {
+        padding: 5px 15px;
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+
+    .content {
+        padding: 10px;
+    }
+
+    .content input[type="text"] {
+        padding: 6px;
+        font-size: 13px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .worker-wrapper {
+        border-radius: 15px;
+    }
+
+    .worker-banner canvas {
+        height: 120px;
+        border-radius: 15px 15px 0 0;
+    }
+
+    .worker-details {
+        padding: 60px 10px 10px;
+    }
+
+    .worker-dp {
+        width: 80px;
+        height: 80px;
+        top: -40px;
+    }
+
+    .worker-name h2 {
+        font-size: 14px;
+    }
+
+    .worker-name h2 span {
+        font-size: 10px;
+        margin-bottom: 1.5vh;
+    }
+
+    .worker-bio p {
+        font-size: 11px;
+        line-height: 15px;
+    }
+
+    .worker-button a {
+        width: 140px;
+        height: 32px;
+        font-size: 12px;
+        border-radius: 15px;
+    }
+}
         /* FADE + ZOOM SLIDER İÇİN GÜNCELLEMELER */
 
 /* Slider kapsayıcısına 3D perspektif ekle */
