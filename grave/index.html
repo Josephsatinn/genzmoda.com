@@ -837,7 +837,7 @@
             <div id="details" class="details"></div>
         </div>
     </div>
-  <div id="bottom-nav"></div>
+
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
@@ -847,11 +847,7 @@
     <script src="/grave/script.js"></script>
 
     <script>
- fetch('bottomnav.html')
-            .then(res => res.text())
-            .then(html => {
-                document.getElementById('bottom-nav').innerHTML = html;
-            });
+
         document.addEventListener("DOMContentLoaded", async () => {
             // Header'ı yükle (her sayfada bir kez)
             const headerContainer = document.getElementById('header-container');
