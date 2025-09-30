@@ -650,11 +650,11 @@
 
         if (Math.abs(this.xDiff) > Math.abs(this.yDiff)) {
           if (this.xDiff > 30) {
-            this.onLeft();
+            this.onRight();
             this.xDown = null;
             this.yDown = null;
           } else if (this.xDiff < -30) {
-            this.onRight();
+            this.onLeft();
             this.xDown = null;
             this.yDown = null;
           }
