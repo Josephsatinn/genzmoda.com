@@ -58,6 +58,7 @@
     .left-arrow,
     .right-arrow {
       height: 100%;
+
       display: flex;
       justify-content: center;
       align-items: center;
@@ -75,7 +76,10 @@
       overflow: hidden;
       position: relative;
       perspective: 100px;
+      touch-action: pan-y;
+      -webkit-user-select: none;
       user-select: none;
+      /* Ekle */
     }
 
     .slider-content-background {
@@ -153,6 +157,7 @@
       box-shadow: 0px 0.4rem 1.6rem rgba(0, 0, 0, 0.5) !important;
       filter: brightness(1);
       pointer-events: auto;
+      /* Tıklama için merkez kartı aktif et */
     }
 
     .slide.position-3:hover {
@@ -226,7 +231,9 @@
       z-index: 1;
       object-fit: contain;
       user-select: none;
+      /* Ekle */
       pointer-events: none;
+      /* Ekle */
     }
 
     .card-sections {
@@ -285,6 +292,7 @@
 
     .line::before {
       animation: progress1 4s forwards;
+      /* "infinite" yerine "forwards" */
       transform-origin: 0 0;
       content: "";
       display: block;
@@ -297,6 +305,7 @@
       content: "";
       position: absolute;
       animation: progress2 4s forwards;
+      /* "infinite" yerine "forwards" */
       transform-origin: 90% 50%;
       margin-left: -24px;
       top: -9px;
@@ -352,6 +361,7 @@
     }
 
     @media screen and (max-width: 620px) {
+
       .slide.position-1,
       .slide.position-5 {
         opacity: 0.5 !important;
@@ -385,6 +395,7 @@
     }
 
     @media screen and (max-width: 445px) {
+
       .slide.position-1,
       .slide.position-5 {
         opacity: 0 !important;
@@ -417,47 +428,7 @@
       }
     }
 
-    @media screen and (max-width: 415px) {
-      .slide {
-        opacity: 0 !important;
-        box-shadow: none !important;
-      }
-
-      .slide.position-3 {
-        box-shadow: none !important;
-        opacity: 1 !important;
-        width: 80vw;
-        height: 80vh;
-      }
-
-      .slide.position-1,
-      .slide.position-2 {
-        left: -50% !important;
-        transform: translate(-50%, 0) rotateY(0deg) scale(0.7, 0.7) !important;
-      }
-
-      .slide.position-4,
-      .slide.position-5 {
-        left: 150% !important;
-        transform: translate(-50%, 0) rotateY(0deg) scale(0.7, 0.7) !important;
-      }
-
-      .media img {
-        max-width: 95%;
-      }
-
-      .right-arrow,
-      .left-arrow {
-        display: none;
-      }
-
-      .slider-content .slide {
-        height: 55%;
-        max-height: 90vh;
-        width: 6%;
-        min-width: 60%;
-      }
-    }
+    
   </style>
 </head>
 
@@ -476,6 +447,7 @@
             <img src="bot.png" alt="Bot Projesi">
           </div>
           <div class="card-sections">
+
             <div class="lower-section">
               <h2>Bot</h2>
               <button>Projeye Git</button>
@@ -487,6 +459,7 @@
             <img src="genzmoda.png" alt="Genzmoda Projesi">
           </div>
           <div class="card-sections">
+
             <div class="lower-section">
               <h2>Genzmoda</h2>
               <button>Projeye Git</button>
@@ -498,6 +471,7 @@
             <img src="grave.png" alt="Grave Projesi">
           </div>
           <div class="card-sections">
+
             <div class="lower-section">
               <h2>Grave</h2>
               <button>Projeye Git</button>
@@ -510,197 +484,166 @@
     </div>
   </div>
 
-  <script>
-    // Sayfanın ilk yüklenmesi
-    window.addEventListener("load", () => {
-      const loading = document.getElementById("loading");
-      loading.style.display = "flex";
-      setTimeout(() => {
-        loading.style.display = "none";
-      }, 2000);
-    });
+<script>
+(function(){
+  // elemanlar
+  const sliderContent = document.getElementById("slider-content");
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const leftArrow = document.querySelector(".left-arrow");
+  const rightArrow = document.querySelector(".right-arrow");
+  const loading = document.getElementById("loading");
 
-    // Sayfaya geri dönüldüğünde veya önbellekten yüklendiğinde
-    window.addEventListener("pageshow", (event) => {
-      const loading = document.getElementById("loading");
-      if (event.persisted) {
-        loading.style.display = "flex";
-        const line = loading.querySelector(".line");
+  // yükleme overlay
+  window.addEventListener("load", () => {
+    if(loading) {
+      loading.style.display = "flex";
+      setTimeout(()=> loading.style.display = "none", 2000);
+    }
+  });
+  window.addEventListener("pageshow", (event) => {
+    if (!loading) return;
+    if (event.persisted) {
+      loading.style.display = "flex";
+      const line = loading.querySelector(".line");
+      if (line) {
         line.style.animation = "none";
-        setTimeout(() => {
+        setTimeout(()=> {
           line.style.animation = "";
-          loading.style.display = "flex";
-          setTimeout(() => {
-            loading.style.display = "none";
-          }, 2000);
+          setTimeout(()=> loading.style.display = "none", 2000);
         }, 10);
       }
-    });
+    }
+  });
 
-    var sliders = document.querySelectorAll(".slide");
-    var center = Math.floor(sliders.length / 2);
-    var leftMid = center - 1 >= 0 ? center - 1 : sliders.length - 1;
-    var rightMid = center + 1 < sliders.length ? center + 1 : 0;
-    let isDragging = false;
-    let startX;
+  if(!sliderContent || slides.length === 0) {
+    console.warn("Slider element veya slide bulunamadı.");
+    return;
+  }
 
-    sliders.forEach((slide, index) => {
-      slide.classList.add("position-none");
-      if (index === leftMid) slide.classList.add("position-2");
-      if (index === center) slide.classList.add("position-3");
-      if (index === rightMid) slide.classList.add("position-4");
-    });
+  // merkez index
+  let center = Math.floor(slides.length / 2);
 
-    function leftScroll() {
-      sliders.forEach(slide => {
-        slide.classList.remove("position-2", "position-3", "position-4", "position-none");
-      });
+  // pozisyonları ata
+function applyPositions() {
+  slides.forEach(slide => {
+    // sadece position-* sınıflarını temizle
+    slide.classList.remove(
+      "position-1",
+      "position-2",
+      "position-3",
+      "position-4",
+      "position-5",
+      "position-none"
+    );
+    // varsayılan olarak position-none ekle
+    slide.classList.add("position-none");
+  });
 
-      center = center - 1 < 0 ? sliders.length - 1 : center - 1;
-      leftMid = leftMid - 1 < 0 ? sliders.length - 1 : leftMid - 1;
-      rightMid = rightMid - 1 < 0 ? sliders.length - 1 : rightMid - 1;
+  slides.forEach((slide, index) => {
+    let diff = index - center;
+    if (diff < -Math.floor(slides.length / 2)) diff += slides.length;
+    if (diff > Math.floor(slides.length / 2)) diff -= slides.length;
 
-      sliders.forEach((slide, index) => {
-        slide.classList.add("position-none");
-        if (index === leftMid) slide.classList.add("position-2");
-        if (index === center) slide.classList.add("position-3");
-        if (index === rightMid) slide.classList.add("position-4");
-      });
+    if (diff === -2) slide.classList.add("position-1");
+    if (diff === -1) slide.classList.add("position-2");
+    if (diff === 0)  slide.classList.add("position-3");
+    if (diff === 1)  slide.classList.add("position-4");
+    if (diff === 2)  slide.classList.add("position-5");
+  });
+}
+
+  applyPositions();
+
+  function leftScroll() {
+    center = (center - 1 + slides.length) % slides.length;
+    applyPositions();
+  }
+
+  function rightScroll() {
+    center = (center + 1) % slides.length;
+    applyPositions();
+  }
+
+  // oklar
+  if (leftArrow) leftArrow.addEventListener("click", leftScroll);
+  if (rightArrow) rightArrow.addEventListener("click", rightScroll);
+
+  // MOUSE DRAG
+  let isMouseDown = false;
+  let mouseStartX = 0;
+
+  sliderContent.addEventListener("mousedown", (e) => {
+    isMouseDown = true;
+    mouseStartX = e.clientX;
+    sliderContent.style.cursor = "grabbing";
+  });
+
+  window.addEventListener("mousemove", (e) => {
+    if (!isMouseDown) return;
+    e.preventDefault();
+  });
+
+  window.addEventListener("mouseup", (e) => {
+    if (!isMouseDown) return;
+    isMouseDown = false;
+    sliderContent.style.cursor = "grab";
+    const diff = e.clientX - mouseStartX;
+    if (Math.abs(diff) > 50) {
+      if (diff > 0) leftScroll(); else rightScroll();
+    }
+  });
+
+  // TOUCH SWIPE
+  let xDown = null;
+  let yDown = null;
+
+  sliderContent.addEventListener("touchstart", function(evt){
+    if(!evt.touches || evt.touches.length === 0) return;
+    xDown = evt.touches[0].clientX;
+    yDown = evt.touches[0].clientY;
+  }, {passive: true});
+
+  sliderContent.addEventListener("touchend", function(evt){
+    if (!xDown || !yDown) { xDown = null; yDown = null; return; }
+    const touch = (evt.changedTouches && evt.changedTouches[0]) || null;
+    if (!touch) { xDown = null; yDown = null; return; }
+    const xUp = touch.clientX;
+    const yUp = touch.clientY;
+    const xDiff = xDown - xUp;
+    const yDiff = yDown - yUp;
+
+    if (Math.abs(xDiff) > Math.abs(yDiff) && Math.abs(xDiff) > 50) {
+      if (xDiff > 0) rightScroll();
+      else leftScroll();
     }
 
-    function rightScroll() {
-      sliders.forEach(slide => {
-        slide.classList.remove("position-2", "position-3", "position-4", "position-none");
-      });
+    xDown = null;
+    yDown = null;
+  }, {passive: true});
 
-      center = center + 1 >= sliders.length ? 0 : center + 1;
-      leftMid = leftMid + 1 >= sliders.length ? 0 : leftMid + 1;
-      rightMid = rightMid + 1 >= sliders.length ? 0 : rightMid + 1;
-
-      sliders.forEach((slide, index) => {
-        slide.classList.add("position-none");
-        if (index === leftMid) slide.classList.add("position-2");
-        if (index === center) slide.classList.add("position-3");
-        if (index === rightMid) slide.classList.add("position-4");
-      });
-    }
-
-    const sliderContent = document.getElementById('slider-content');
-
-    // Fare ile sürükleme
-    sliderContent.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      startX = e.clientX;
-      sliderContent.style.cursor = 'grabbing';
-    });
-
-    sliderContent.addEventListener('mouseup', (e) => {
-      if (!isDragging) return;
-      isDragging = false;
-      sliderContent.style.cursor = 'grab';
-      const endX = e.clientX;
-      const diff = endX - startX;
-      if (Math.abs(diff) > 50) {
-        if (diff > 0) {
-          leftScroll();
-        } else {
-          rightScroll();
-        }
+  // Kart tıklaması
+  slides.forEach(slide => {
+    slide.addEventListener("click", (e) => {
+      if (slide.classList.contains("position-3")) {
+        const href = slide.getAttribute("data-href");
+        if (!href) return;
+        if (loading) loading.style.display = "flex";
+        setTimeout(()=> {
+          window.location.href = href;
+        }, 500);
+      } else {
+        const index = slides.indexOf(slide);
+        if (index === -1) return;
+        center = index;
+        applyPositions();
       }
     });
+  });
 
-    sliderContent.addEventListener('mouseleave', () => {
-      isDragging = false;
-      sliderContent.style.cursor = 'grab';
-    });
+})();
+</script>
 
-    // Dokunmatik cihazlar için sürükleme
-    class Swipe {
-      constructor(element) {
-        this.xDown = null;
-        this.yDown = null;
-        this.element = typeof element === 'string' ? document.querySelector(element) : element;
 
-        this.element.addEventListener('touchstart', (evt) => {
-          evt.preventDefault();
-          this.xDown = evt.touches[0].clientX;
-          this.yDown = evt.touches[0].clientY;
-        }, { passive: false });
-      }
-
-      onLeft(callback) {
-        this.onLeft = callback;
-        return this;
-      }
-
-      onRight(callback) {
-        this.onRight = callback;
-        return this;
-      }
-
-      handleTouchMove(evt) {
-        if (!this.xDown || !this.yDown) return;
-
-        evt.preventDefault();
-        const xUp = evt.touches[0].clientX;
-        const yUp = evt.touches[0].clientY;
-
-        this.xDiff = this.xDown - xUp;
-        this.yDiff = this.yDown - yUp;
-
-        if (Math.abs(this.xDiff) > Math.abs(this.yDiff)) {
-          if (this.xDiff > 30) {
-            this.onRight();
-            this.xDown = null;
-            this.yDown = null;
-          } else if (this.xDiff < -30) {
-            this.onLeft();
-            this.xDown = null;
-            this.yDown = null;
-          }
-        }
-      }
-
-      handleTouchEnd() {
-        this.xDown = null;
-        this.yDown = null;
-      }
-
-      run() {
-        this.element.addEventListener('touchmove', (evt) => {
-          this.handleTouchMove(evt);
-        }, { passive: false });
-
-        this.element.addEventListener('touchend', () => {
-          this.handleTouchEnd();
-        }, { passive: false });
-      }
-    }
-
-    var swiper = new Swipe(sliderContent);
-    swiper.onLeft(leftScroll);
-    swiper.onRight(rightScroll);
-    swiper.run();
-
-    // Oklara tıklama
-    $(".left-arrow").on("click", leftScroll);
-    $(".right-arrow").on("click", rightScroll);
-
-    // Kartlara tıklama
-    document.querySelectorAll(".slide").forEach(slide => {
-      slide.addEventListener("click", e => {
-        e.preventDefault();
-        if (slide.classList.contains("position-3")) {
-          const href = slide.getAttribute("data-href");
-          const loading = document.getElementById("loading");
-          loading.style.display = "flex";
-          setTimeout(() => {
-            window.location.href = href;
-          }, 2000);
-        }
-      });
-    });
-  </script>
 </body>
 
 </html>
