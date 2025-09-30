@@ -58,7 +58,6 @@
     .left-arrow,
     .right-arrow {
       height: 100%;
-
       display: flex;
       justify-content: center;
       align-items: center;
@@ -77,7 +76,6 @@
       position: relative;
       perspective: 100px;
       user-select: none;
-      /* Ekle */
     }
 
     .slider-content-background {
@@ -155,7 +153,6 @@
       box-shadow: 0px 0.4rem 1.6rem rgba(0, 0, 0, 0.5) !important;
       filter: brightness(1);
       pointer-events: auto;
-      /* Tıklama için merkez kartı aktif et */
     }
 
     .slide.position-3:hover {
@@ -229,9 +226,7 @@
       z-index: 1;
       object-fit: contain;
       user-select: none;
-      /* Ekle */
       pointer-events: none;
-      /* Ekle */
     }
 
     .card-sections {
@@ -290,7 +285,6 @@
 
     .line::before {
       animation: progress1 4s forwards;
-      /* "infinite" yerine "forwards" */
       transform-origin: 0 0;
       content: "";
       display: block;
@@ -303,7 +297,6 @@
       content: "";
       position: absolute;
       animation: progress2 4s forwards;
-      /* "infinite" yerine "forwards" */
       transform-origin: 90% 50%;
       margin-left: -24px;
       top: -9px;
@@ -359,7 +352,6 @@
     }
 
     @media screen and (max-width: 620px) {
-
       .slide.position-1,
       .slide.position-5 {
         opacity: 0.5 !important;
@@ -393,7 +385,6 @@
     }
 
     @media screen and (max-width: 445px) {
-
       .slide.position-1,
       .slide.position-5 {
         opacity: 0 !important;
@@ -431,10 +422,7 @@
         opacity: 0 !important;
         box-shadow: none !important;
       }
-      .slider-content{
-        width: 80%;
-        
-      }
+
       .slide.position-3 {
         box-shadow: none !important;
         opacity: 1 !important;
@@ -444,13 +432,13 @@
 
       .slide.position-1,
       .slide.position-2 {
-        left: 27% !important;
+        left: -50% !important;
         transform: translate(-50%, 0) rotateY(0deg) scale(0.7, 0.7) !important;
       }
 
       .slide.position-4,
       .slide.position-5 {
-        left: 73% !important;
+        left: 150% !important;
         transform: translate(-50%, 0) rotateY(0deg) scale(0.7, 0.7) !important;
       }
 
@@ -488,7 +476,6 @@
             <img src="bot.png" alt="Bot Projesi">
           </div>
           <div class="card-sections">
-
             <div class="lower-section">
               <h2>Bot</h2>
               <button>Projeye Git</button>
@@ -500,7 +487,6 @@
             <img src="genzmoda.png" alt="Genzmoda Projesi">
           </div>
           <div class="card-sections">
-
             <div class="lower-section">
               <h2>Genzmoda</h2>
               <button>Projeye Git</button>
@@ -512,7 +498,6 @@
             <img src="grave.png" alt="Grave Projesi">
           </div>
           <div class="card-sections">
-
             <div class="lower-section">
               <h2>Grave</h2>
               <button>Projeye Git</button>
@@ -529,9 +514,9 @@
     // Sayfanın ilk yüklenmesi
     window.addEventListener("load", () => {
       const loading = document.getElementById("loading");
-      loading.style.display = "flex"; // İlk yüklemede göster
+      loading.style.display = "flex";
       setTimeout(() => {
-        loading.style.display = "none"; // 2 saniye sonra gizle
+        loading.style.display = "none";
       }, 2000);
     });
 
@@ -539,17 +524,16 @@
     window.addEventListener("pageshow", (event) => {
       const loading = document.getElementById("loading");
       if (event.persisted) {
-        loading.style.display = "flex"; // Geri dönüldüğünde göster
-        // Animasyonu sıfırlamak için line öğesini yeniden yükle
+        loading.style.display = "flex";
         const line = loading.querySelector(".line");
         line.style.animation = "none";
         setTimeout(() => {
-          line.style.animation = ""; // Animasyonu sıfırla
-          loading.style.display = "flex"; // Göster
+          line.style.animation = "";
+          loading.style.display = "flex";
           setTimeout(() => {
-            loading.style.display = "none"; // 2 saniye sonra gizle
+            loading.style.display = "none";
           }, 2000);
-        }, 10); // Küçük bir gecikme ile animasyonu sıfırla
+        }, 10);
       }
     });
 
@@ -616,11 +600,11 @@
       sliderContent.style.cursor = 'grab';
       const endX = e.clientX;
       const diff = endX - startX;
-      if (Math.abs(diff) > 50) { // Eşik değeri
+      if (Math.abs(diff) > 50) {
         if (diff > 0) {
-          leftScroll(); // Sola sürükleme -> sola kaydır
+          leftScroll();
         } else {
-          rightScroll(); // Sağa sürükleme -> sağa kaydır
+          rightScroll();
         }
       }
     });
@@ -635,12 +619,13 @@
       constructor(element) {
         this.xDown = null;
         this.yDown = null;
-        this.element = typeof (element) === 'string' ? document.querySelector(element) : element;
+        this.element = typeof element === 'string' ? document.querySelector(element) : element;
 
         this.element.addEventListener('touchstart', (evt) => {
+          evt.preventDefault();
           this.xDown = evt.touches[0].clientX;
           this.yDown = evt.touches[0].clientY;
-        }, false);
+        }, { passive: false });
       }
 
       onLeft(callback) {
@@ -656,20 +641,27 @@
       handleTouchMove(evt) {
         if (!this.xDown || !this.yDown) return;
 
-        var xUp = evt.touches[0].clientX;
-        var yUp = evt.touches[0].clientY;
+        evt.preventDefault();
+        const xUp = evt.touches[0].clientX;
+        const yUp = evt.touches[0].clientY;
 
         this.xDiff = this.xDown - xUp;
         this.yDiff = this.yDown - yUp;
 
         if (Math.abs(this.xDiff) > Math.abs(this.yDiff)) {
-          if (this.xDiff > 50) {
-            this.onLeft(); // Sola sürükleme -> sola kaydır
-          } else if (this.xDiff < -50) {
-            this.onRight(); // Sağa sürükleme -> sağa kaydır
+          if (this.xDiff > 30) {
+            this.onLeft();
+            this.xDown = null;
+            this.yDown = null;
+          } else if (this.xDiff < -30) {
+            this.onRight();
+            this.xDown = null;
+            this.yDown = null;
           }
         }
+      }
 
+      handleTouchEnd() {
         this.xDown = null;
         this.yDown = null;
       }
@@ -677,7 +669,11 @@
       run() {
         this.element.addEventListener('touchmove', (evt) => {
           this.handleTouchMove(evt);
-        }, false);
+        }, { passive: false });
+
+        this.element.addEventListener('touchend', () => {
+          this.handleTouchEnd();
+        }, { passive: false });
       }
     }
 
@@ -704,7 +700,6 @@
         }
       });
     });
-    
   </script>
 </body>
 
